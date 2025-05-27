@@ -1,0 +1,40 @@
+{
+  "name": "@duque.edits/rest",
+  "version": "1.1.2",
+  "main": "index.js",
+  "types": "./index.d.ts",
+  "type": "commonjs",
+  "description": "An SDK that facilitates interaction with my API.",
+  "keywords": [
+    "REST",
+    "API",
+    "SDK",
+    "DuqueEdits"
+  ],
+  "author": "Duque Edits jedits077@gmail.com",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/duque7x/rest-api.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/duque7x/rest-api/issues"
+  },
+  "homepage": "https://github.com/duque7x/rest-api#readme",
+  "dependencies": {
+    "undici": "^7.10.0"
+  },
+  "devDependencies": {
+    "chalk": "^4.1.2"
+  },
+  "scripts": {
+    "test": "node test.test.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

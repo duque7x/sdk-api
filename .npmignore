@@ -1,0 +1,18 @@
+# Ignore local/dev files
+.git
+node_modules
+.env
+.vscode
+*.log
+*.test.js
+__tests__/
+coverage/
+
+# Ignore configs not needed at runtime
+babel.config.js
+jest.config.js
+tsconfig.json
+webpack.config.js
+package-lock.json
+
+connection.js
