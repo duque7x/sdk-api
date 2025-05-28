@@ -11,13 +11,16 @@
     "SDK",
     "DuqueEdits"
   ],
+  "scripts": {
+    "test": "node tests/base.js",
+    "fetches": "node tests/fetches.js"
+  },
   "author": "Duque Edits jedits077@gmail.com",
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/duque7x/rest-api.git"
   },
-
   "bugs": {
     "url": "https://github.com/duque7x/rest-api/issues"
   },
@@ -27,9 +30,6 @@
   },
   "devDependencies": {
     "chalk": "^4.1.2"
-  },
-  "scripts": {
-    "test": "node test.test.js"
   },
   "publishConfig": {
     "access": "public"

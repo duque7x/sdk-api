@@ -1,21 +1,41 @@
-import EventEmmiter from "node:events";
 import { GuildsManager } from "../managers/GuildsManager";
 import { Collection } from "../structures/Collection";
 import { User } from "../structures/User";
 import { Bet } from "../structures/Bet";
 import { Match } from "../structures/Match";
+import { Guild } from "../structures/Guild";
 import { BetUser } from "../structures/BetUser";
+import { EventEmitter } from 'events'; // Import if needed
 
-export declare class REST extends EventEmmiter {
-    request(method: string, path: string, body?: any): Promise<body>;
+type EventMap = {
+    userCreate: User;
+    betUserCreate: BetUser;
+    betUpdate: Bet;
+    guildDelete: Guild;
+    matchEnd: Match;
+};
+
+export declare class REST extends EventEmitter {
+    /**
+     * Makes a REST request and returns the updated body.
+     * @param method HTTP method (e.g., GET, POST)
+     * @param path Endpoint path
+     * @param body Optional request body (will be updated and returned)
+     * @returns Promise resolving with the updated body
+     */
+    request<T = any>(method: string, path: string, body?: T): Promise<T>;
+
+    /**
+     * Initializes the REST client.
+     */
     init(): Promise<void>;
-    guilds: GuildsManager;
 
+    guilds: GuildsManager;
     users: Collection<string, User>;
     betUsers: Collection<string, BetUser>;
     bets: Collection<string, Bet>;
     matches: Collection<string, Match>;
 
-    on<K>(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    on<K extends keyof EventMap>(eventName: K, listener: (args: EventMap[K]) => void): this;
     on(eventName: "userCreate", listener: (args: User) => void): this;
 }

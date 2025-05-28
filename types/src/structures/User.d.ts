@@ -3,7 +3,7 @@ import { BaseUser } from "./BaseUser";
 /**
  * Represents a protection type with additional details.
  */
-interface Protection {
+declare interface UserProtection {
   type: "point_protect" | "immunity" | "double_points"; // Type of protection
   longevity: number; // Duration for which the protection lasts
   addedBy: string; // User who added the protection
@@ -13,7 +13,7 @@ interface Protection {
 /**
  * Represents a channel associated with a player's original channels.
  */
-interface OriginalChannel {
+interface UserOriginalChannel {
   channelId: string; // The ID of the channel
   matchId: string; // The ID of the match associated with the channel
 }
@@ -49,13 +49,13 @@ export class User extends BaseUser {
    * List of protections the player has.
    * Default: Contains a "point_protect" protection added by the specified user.
    */
-  protections: Protection[];
+  protections: UserProtection[];
 
   /**
    * List of channels that were originally associated with the player.
    * Default: Contains a channel and match ID pair.
    */
-  originalChannels: OriginalChannel[];
+  originalChannels: UserOriginalChannel[];
 
   /**
    * Will return user's data

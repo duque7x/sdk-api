@@ -20,10 +20,10 @@ export * from "./types/src/payloads/UserCreatePayload";
 
 
 export interface BetUserFields {
-    /**
-  * The amount of credit the player has achieved.
-  * @default 0
-  */
+  /**
+* The amount of credit the player has achieved.
+* @default 0
+*/
   credit?: number;
 
   /**
@@ -44,3 +44,58 @@ export interface BetUserFields {
    */
   blacklisted?: boolean;
 }
+export declare const Routes: {
+  base: string;
+
+  field: () => string;
+  fields: (field: string[]) => string;
+
+  guilds: {
+    get: (id: string) => string;
+    getAll: () => string;
+    create: () => string;
+    delete: (id: string) => string;
+    deleteAll: () => string;
+    resource: (resourceName: string, guildId: string) => string;
+
+    users: {
+      getAll: (guildId: string) => string;
+      get: (userId: string, guildId: string) => string;
+      create: (guildId: string) => string;
+      update: (userId: string, guildId: string) => string;
+      delete: (userId: string, guildId: string) => string;
+      deleteAll: (guildId: string) => string;
+      resource: (userId: string, resourceName: string, guildId: string) => string;
+    };
+
+    betUsers: {
+      getAll: (guildId: string) => string;
+      get: (userId: string, guildId: string) => string;
+      create: (guildId: string) => string;
+      update: (userId: string, guildId: string) => string;
+      delete: (userId: string, guildId: string) => string;
+      deleteAll: (guildId: string) => string;
+      resource: (userId: string, resourceName: string, guildId: string) => string;
+    };
+
+    matches: {
+      getAll: (guild: string) => string;
+      get: (matchId: string, guildId: string) => string;
+      create: (guild: string) => string;
+      update: (matchId: string, guildId: string) => string;
+      delete: (matchId: string, guildId: string) => string;
+      deleteAll: (guild: string) => string;
+      resource: (matchId: string, resourceName: string, guildId: string) => string;
+    };
+
+    bets: {
+      getAll: (guildId: string) => string;
+      get: (betId: string, guildId: string) => string;
+      create: (guildId: string) => string;
+      update: (betId: string, guildId: string) => string;
+      delete: (betId: string, guildId: string) => string;
+      deleteAll: (guildId: string) => string;
+      resource: (guildId: string, args: string[]) => string;
+    };
+  };
+};

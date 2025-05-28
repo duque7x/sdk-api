@@ -5,6 +5,7 @@ import { BetUsersManager } from "../managers/BetUsersManager";
 import { REST } from "../rest/REST";
 import { MATCHTYPES } from "../payloads/MatchCreatePayload";
 import { BETTYPES } from "../payloads/BetCreatePayload";
+import { Collection } from "./Collection";
 
 interface GuildData {
     prefix: string;
@@ -20,19 +21,20 @@ interface GuildData {
     };
     seasonId: string;
     betsChannelId: string;
+    mediators: Collection<string, { name: string, id: string, joinedAt: Date, paymentLinks: string[] }>;
 }
 
 export class Guild {
     prefix: string;
     id: string;
     seasonId: string;
-
+    mediators: Collection<string, { name: string, id: string, joinedAt: Date, paymentLinks: string[] }>;
     betsChannels: {
         "1v1": string,
         "2v2": string,
         "3v3": string,
         "4v4": string,
-    };
+    } | Record<string, string>;
 
     name: string;
     _id: string;
@@ -79,8 +81,8 @@ type KeysAvailable = {
     pricesAvailable: number;
     state: {
         state: {
-            matchesStatus: States,
-            rankStatus: States
+            matchesStatus: STATES,
+            rankStatus: STATES
         }
     };
     seasonId: string;
@@ -89,4 +91,6 @@ type KeysAvailable = {
         type: MATCHTYPES | BETTYPES | string,
         id: string
     };
+
+    mediators: { name?: string, id: string, joinedAt?: Date, paymentLinks?: string[] }
 };

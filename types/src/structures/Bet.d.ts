@@ -43,7 +43,7 @@ export declare class Bet extends BaseMatch {
     }];
 
 
-    price: string;
+    price: number;
     payedBy: string;
 
     textChannel: string;

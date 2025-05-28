@@ -32,7 +32,6 @@ type BetUserData = {
 export class BetUser extends BaseUser {
   credit: number;
   betsPlayed?: string[];
-  blacklisted?: boolean;
   
   constructor(data: BetUserData, rest: REST, guildId: string);
 

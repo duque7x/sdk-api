@@ -50,3 +50,4 @@ exports.STATES = STATES;
 exports.MATCHTYPES = MATCHTYPES;
 exports.BETTYPES = BETTYPES;
 exports.Collection = Collection;
+exports.Routes = require("./src/rest/Routes");

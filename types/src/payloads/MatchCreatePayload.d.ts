@@ -8,7 +8,7 @@ export enum MATCHTYPES {
 }
 
 export interface MatchCreatePayload {
-    type: MatchTypes;
+    type: MATCHTYPES;
     creatorId: string;
     maximumSize: number;
 }

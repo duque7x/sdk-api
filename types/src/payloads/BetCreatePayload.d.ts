@@ -13,7 +13,7 @@ export interface BetPlayer {
     name: string;
 }
 export type BetCreatePayload  = {
-    type: BetTypes;
+    type: BETTYPES | string;
     creatorId: string;
     adminId: string;
     price: number;
