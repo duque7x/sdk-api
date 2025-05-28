@@ -19,12 +19,12 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/duque7x/rest-api.git"
+    "url": "https://github.com/duque7x/sdk-api.git"
   },
   "bugs": {
-    "url": "https://github.com/duque7x/rest-api/issues"
+    "url": "https://github.com/duque7x/sdk-api/issues"
   },
-  "homepage": "https://github.com/duque7x/rest-api#readme",
+  "homepage": "https://github.com/duque7x/sdk-api#readme",
   "dependencies": {
     "undici": "^7.10.0"
   },
