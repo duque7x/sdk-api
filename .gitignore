@@ -128,5 +128,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-src/rest/REST.js
 test.test.js
