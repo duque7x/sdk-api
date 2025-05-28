@@ -25,7 +25,12 @@ class Guild {
         this._id = data?._id;
         this.seasonId = data?.seasonId;
         this.blacklist = data?.blacklist;
-        this.betsChannels = data?.betsChannels;
+        this.betsChannels = {
+            "1v1": data?.betsChannels["1v1"],
+            "2v2": data?.betsChannels["2v2"],
+            "3v3": data?.betsChannels["3v3"],
+            "4v4": data?.betsChannels["4v4"],
+        };
         this.#data = data;
         this.#rest = rest;
 
@@ -62,7 +67,7 @@ class Guild {
             this.matches.set(match?._id, new Match(match, this.#rest, id));
             this.#rest.matches.set(match?._id, new Match(match, this.#rest, id));
         }
-        for (let mediator of this.#data.mediators) {
+        for (let mediator of this.#data.mediators ?? []) {
             if (!mediator || !mediator.id) continue;
             this.mediators.set(mediator.id, new Mediator(mediator, this.#rest, id));
         }

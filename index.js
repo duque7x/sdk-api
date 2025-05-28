@@ -27,7 +27,7 @@ const BETTYPES = {
 }
 const STATES = {
   ON: "on",
-  OFF: "on",
+  OFF: "off",
   CREATED: "created",
   SHUTTED: "shutted",
   WAITING: "waiting",

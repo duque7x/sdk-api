@@ -9,18 +9,18 @@ exports.BetUser = class {
    * @param {*} data 
    */
   constructor(data, rest, guildId) {
-    this.id = data?.id;
-    this.name = data?.name;
-    this.credit = data?.credit;
-    this.wins = data?.wins;
-    this.mvps = data?.mvps;
-    this.losses = data?.losses;
-    this.betsPlayed = data?.betsPlayed;
-    this.blacklist = data?.blacklist;
+    this.id = data?.id || "";
+    this.name = data?.name || "";
+    this.credit = Number(data?.credit) || 0;
+    this.wins = Number(data?.wins) || 0;
+    this.mvps = Number(data?.mvps) || 0;
+    this.losses = Number(data?.losses) || 0;
+    this.betsPlayed = data?.betsPlayed || [];
+    this.blacklist = data?.blacklist || false;
     this.#rest = rest;
     this.#data = data;
 
-    this.guildId = guildId;
+    this.guildId = guildId ?? "";
   }
   get data() {
     return this.#data;
@@ -92,4 +92,41 @@ exports.BetUser = class {
     this[key] = updatedField;
     return this;
   };
+
+  async update(payload) {
+    assert(payload && typeof payload === "object", "Payload must be an object");
+    let finalPayload = {};
+
+    if (payload.type == "add") {
+      for (let key in payload) {
+        if (key === "type") continue; // Skip type
+
+        if (key == "losses") finalPayload.losses = Math.max(0, this.losses + payload.losses);
+        if (key == "wins") finalPayload.wins = Math.max(0, this.wins + payload.wins);
+        if (key == "mvps") finalPayload.mvps = Math.max(0, this.mvps + payload.mvps);
+        if (key == "credit") finalPayload.credit = Math.max(0, this.credit + payload.credit);
+
+        if (key == "betsPlayed") {
+          finalPayload.betsPlayed = [...this.betsPlayed]; // Start with existing bets
+          for (let bet of payload.betsPlayed) {
+            if (!finalPayload.betsPlayed.includes(bet)) {
+              finalPayload.betsPlayed.push(bet); // Add only if not present
+            }
+          }
+        }
+      }
+    } else {
+      finalPayload = { ...payload };
+    }
+    const route = Routes.guilds.betUsers.update(this.id, this.guildId);
+    const response = await this.#rest.request("PATCH", route, finalPayload);
+
+    for (let key in response) {
+      if (key === "id" || key === "guildId") continue;
+      this[key] = response[key];
+    }
+
+    return this;
+  }
 }
+

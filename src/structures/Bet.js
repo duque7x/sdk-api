@@ -9,7 +9,7 @@ class Bet {
      * @param {*} data 
      */
     constructor(data, rest, guildId) {
-        this.players = data?.players;
+        this.players = data?.players ?? [];
         this.price = data?.price;
         this.payedBy = data?.payedBy;
         this.createdAt = data?.createdAt;
@@ -25,7 +25,7 @@ class Bet {
         this.teamA = data?.teamA;
         this.teamB = data?.teamB;
         this.creatorId = data?.creatorId;
-        this.adminId = data?.adminId;
+        this.mediatorId = data?.mediatorId;
         this.confirmed = data?.confirmed;
         this._id = data?._id;
         this.#rest = rest;
@@ -46,14 +46,14 @@ class Bet {
         if (field === "channels") {
             console.log({ field, amount });
 
-            const payload = { channel: amount, guildId: this.guildId };
+            const payload = { channel: amount };
             const updatedField = await this.#rest.request("PATCH", route, payload);
 
             this[amount.type] = { id: updatedField.id };
 
             return updatedField;
         }
-        const updatedField = await this.#rest.request("PATCH", route, { [field]: amount, guildId: this.guildId }
+        const updatedField = await this.#rest.request("PATCH", route, { [field]: amount }
         );
 
         this[field] = updatedField;
@@ -64,7 +64,7 @@ class Bet {
         const updatedField = await this.#rest.request(
             "PATCH",
             route,
-            { [field]: -amount, guildId: this.guildId }
+            { [field]: -amount }
         );
 
         this[field] = updatedField;
@@ -81,14 +81,13 @@ class Bet {
             assert(value.id && typeof value.id === "string", "Value id must be a string");
             assert(value.type && typeof value.type === "string", "Payload must include a type");
 
-            const payload = { entry: { type: value.type, id: value.id }, guildId: this.guildId };
+            const payload = { entry: { type: value.type, id: value.id } };
             const updatedField = await this.#rest.request("POST", route, payload);
             this.confirmed = updatedField;
-            console.log({  updatedField     });
 
             return this.confirmed;
         }
-        const payload = { set: value, guildId: this.guildId };
+        const payload = { set: value };
         const updatedField = await this.#rest.request("PATCH", route, payload);
         this[key] = updatedField;
         return this;

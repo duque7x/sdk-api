@@ -69,7 +69,7 @@ export class Guild {
 }
 export declare enum STATES {
     "ON" = "on",
-    "OFF" = "on",
+    "OFF" = "off",
     "CREATED" = "created",
     "SHUTTED" = "shutted",
     "WAITING" = "waiting",

@@ -1,9 +1,9 @@
 import { REST } from "../rest/REST";
-import { BaseUser, Player } from "./BaseUser";
+import { BaseUser } from "./BaseUser";
 
 type BetUserData = {
-  name: string;
-  id: string;
+  name?: string;
+  id?: string;
   /**
   * The amount of credit the player has achieved.
   * @default 0
@@ -23,16 +23,21 @@ type BetUserData = {
   losses?: number;
 
   /**
-   * Indicates whether the player is blacklisted.
+   * Indicates whether the player is blacklist.
    * @default false
    */
-  blacklisted?: boolean;
+  blacklist?: boolean;
+
+  wins?: number;
+  betsPlayed?: string[];
+
+  type: string;
 }
 
 export class BetUser extends BaseUser {
   credit: number;
   betsPlayed?: string[];
-  
+
   constructor(data: BetUserData, rest: REST, guildId: string);
 
   get data(): BetUserData;
@@ -41,9 +46,11 @@ export class BetUser extends BaseUser {
 
   delete(): Promise<BetUserData>;
 
-  add<F extends keyof BetUserData, A = BetUserData[F]>(field: F | string, amount: A): Promise<BetUserData>;
+  add<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUserData>;
 
   remove<F extends keyof BetUserData, A = BetUserData[F]>(field: F | string, amount: A): Promise<BetUserData>;
 
   set<F extends keyof BetUserData, A = BetUserData[F]>(key: F | string, value: A): Promise<BetUserData>;
+
+  update(payload: BetUserData): Promise<BetUser>;
 }

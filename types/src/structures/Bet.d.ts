@@ -9,7 +9,7 @@ type BetData = {
 
     price: string;
     payedBy: string;
-    adminId: string;
+    mediatorId: string;
 
     confirmed: [{
         ids: string[];
@@ -30,6 +30,11 @@ type BetData = {
     }];
 
     status: STATES;
+
+    winners: string,
+    losers: string,
+
+    mediatorId: string;
 }
 
 export declare class Bet extends BaseMatch {
@@ -41,7 +46,7 @@ export declare class Bet extends BaseMatch {
         typeConfirm: string;
         confirmedCount: number;
     }];
-
+    mediatorId: string;
 
     price: number;
     payedBy: string;

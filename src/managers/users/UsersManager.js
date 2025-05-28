@@ -98,7 +98,7 @@ class UsersManager {
     return user;
   }
   async cacheUsers() {
-    const TEN_MINUTES = 10 * 60 * 1000;
+    const FIVE_MINUTES = 5 * 60 * 1000;
 
     const requestUsers = async () => {
       const route = Routes.guilds.users.getAll(this.guildId);
@@ -116,9 +116,10 @@ class UsersManager {
       requestUsers().then(() => {
         console.log(`[CACHE] Refreshed active users`);
       }).catch(console.error); // avoid unhandled rejections
-    }, TEN_MINUTES);
+    }, FIVE_MINUTES);
     return this.#users;
   }
+  
   #setUser(user) {
     if (this.#users.has(user.id)) this.#removeIdFromCache(user.id);
     return this.#users.set(user.id, user);

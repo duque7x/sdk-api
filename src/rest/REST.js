@@ -38,7 +38,7 @@ exports.REST = class extends EventEmitter {
     try {
       const res = await request(url, options);
       const { data, message } = await res.body.json();
-      if (message) console.log(message);      
+      if (message) console.log({message});      
      // console.log(`Response data`, { data }, `Message: `, { message });
       return data;
     } catch (error) {

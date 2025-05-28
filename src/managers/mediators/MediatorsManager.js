@@ -11,7 +11,7 @@ exports.MediatorsManager = class MediatorsManager {
     this.#rest = rest;
     this.#mediators = new Collection();
     this.guildId = guildId;
-    
+
   }
   get cache() {
     return this.#mediators;
@@ -22,13 +22,17 @@ exports.MediatorsManager = class MediatorsManager {
     assert(payload.name && typeof payload.name === "string", "Payload must include name");
     assert(payload.paymentLinks && typeof payload.paymentLinks === "object", "Payload must include paymentLinks");
 
-    const route = Routes.guilds.mediators.create(this.guildId)
-    const response = await this.#rest.request("POST", route, payload)
-    const mediator = new Mediator(response, this.#rest, this.guildId);
+    const route = Routes.guilds.mediators.create(this.guildId);
+    const response = await this.#rest.request("POST", route, payload);
 
-    this.#rest.emit("mediatorCreate", mediator);
-    this.#setMediator(mediator);
-    return mediator;
+    for (let mediatorData of response) {
+      const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
+      this.#setMediator(mediator);
+      if (mediatorData.id == payload.id) {
+        this.#rest.emit("mediatorCreate", mediator);
+        return mediator;
+      }
+    }
   };
 
   set(id, mediator) {
@@ -62,7 +66,7 @@ exports.MediatorsManager = class MediatorsManager {
     return this.#mediators;
   };
 
-  async delete(id) {
+  async remove(id) {
     assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
 
     const route = Routes.guilds.mediators.get(id, this.guildId);
@@ -72,7 +76,7 @@ exports.MediatorsManager = class MediatorsManager {
     this.#removeIdFromCache(id);
     return;
   };
-  async deleteAll() {
+  async removeAll() {
     const route = Routes.guilds.mediators.deleteAll(this.guildId);
     await this.#rest.request("DELETE", route);
 
@@ -93,15 +97,17 @@ exports.MediatorsManager = class MediatorsManager {
     return mediator;
   }
   async cacheMediators() {
-    const TEN_MINUTES = 10 * 60 * 1000;
+    const FIVE_MINUTES = 5 * 60 * 1000;
 
     const requestMediators = async () => {
       const route = Routes.guilds.mediators.getAll(this.guildId);
       const mediators = await this.#rest.request("GET", route);
 
       if (!mediators || mediators.error) return new Collection();
+      this.#mediators.clear();
       for (const mediatorData of mediators) {
         const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
+
         this.#setMediator(mediator);
       }
     };
@@ -111,7 +117,7 @@ exports.MediatorsManager = class MediatorsManager {
       requestMediators().then(() => {
         console.log(`[CACHE] Refreshed active mediators`);
       }).catch(console.error); // avoid unhandled rejections
-    }, TEN_MINUTES);
+    }, FIVE_MINUTES);
     return this.#mediators;
   }
   #setMediator(mediator) {

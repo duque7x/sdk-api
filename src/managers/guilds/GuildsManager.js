@@ -95,7 +95,7 @@ exports.GuildsManager = class GuildsManager {
         return;
     };
     async cacheGuilds() {
-        const TEN_MINUTES = 10 * 60 * 1000;
+        const FIVE_MINUTES = 5 * 60 * 1000;
 
         const requestGuilds = async () => {
             const route = Routes.guilds.getAll();
@@ -113,7 +113,7 @@ exports.GuildsManager = class GuildsManager {
             requestGuilds().then(() => {
                 console.log(`[CACHE] Refreshed active guilds`);
             }).catch(console.error);
-        }, TEN_MINUTES);
+        }, FIVE_MINUTES);
         return this.#guilds;
     }
     #removeIdFromCache(id) {

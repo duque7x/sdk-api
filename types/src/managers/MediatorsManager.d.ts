@@ -24,9 +24,9 @@ export declare class MediatorsManager {
 
   fetchAll(): Collection<string, Mediator>;
 
-  delete(id: string): Promise<void>;
+  remove(id: string): Promise<void>;
 
-  deleteAll(): Promise<void>;
+  removeAll(): Promise<void>;
 
   update(payload: MediatorData): Promise<void>;
 
