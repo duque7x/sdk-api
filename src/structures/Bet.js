@@ -84,9 +84,7 @@ class Bet {
             const payload = { entry: { type: value.type, id: value.id }, guildId: this.guildId };
             const updatedField = await this.#rest.request("POST", route, payload);
             this.confirmed = updatedField;
-            console.log({
-                updatedField
-            });
+            console.log({  updatedField     });
 
             return this.confirmed;
         }

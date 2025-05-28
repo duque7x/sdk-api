@@ -6,6 +6,7 @@ import { REST } from "../rest/REST";
 import { MATCHTYPES } from "../payloads/MatchCreatePayload";
 import { BETTYPES } from "../payloads/BetCreatePayload";
 import { Collection } from "./Collection";
+import { MediatorsManager } from "../managers/MediatorsManager";
 
 interface GuildData {
     prefix: string;
@@ -21,14 +22,13 @@ interface GuildData {
     };
     seasonId: string;
     betsChannelId: string;
-    mediators: Collection<string, { name: string, id: string, joinedAt: Date, paymentLinks: string[] }>;
+    mediators: MediatorsManager;
 }
 
 export class Guild {
     prefix: string;
     id: string;
     seasonId: string;
-    mediators: Collection<string, { name: string, id: string, joinedAt: Date, paymentLinks: string[] }>;
     betsChannels: {
         "1v1": string,
         "2v2": string,
@@ -46,6 +46,7 @@ export class Guild {
     betUsers: BetUsersManager;
     bets: BetsManager;
     matches: MatchesManager;
+    mediators: MediatorsManager;
 
     constructor(data: GuildData, rest: REST);
 
@@ -73,18 +74,20 @@ export declare enum STATES {
     "SHUTTED" = "shutted",
     "WAITING" = "waiting",
 }
+export declare enum BASESTATUS {
+    "ON" = "on",
+    "OFF" = "on",
+}
 
 type KeysAvailable = {
     blacklist: string[];
     prefix: string;
     pricesOn: number;
     pricesAvailable: number;
-    state: {
-        state: {
-            matchesStatus: STATES,
-            rankStatus: STATES
-        }
-    };
+    status: {
+        bets: BASESTATUS;
+        matches: BASESTATUS;
+    }
     seasonId: string;
 
     betsChannels: {

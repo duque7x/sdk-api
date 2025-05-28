@@ -105,8 +105,6 @@ exports.GuildsManager = class GuildsManager {
             this.#guilds.clear();
             for (const guild of guilds) {
                 if (!guild.id) continue;
-                console.log({ guilds });
-
                 this.#guilds.set(guild.id, new Guild(guild, this.#rest));
             }
         };

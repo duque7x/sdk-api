@@ -9,6 +9,8 @@ const { UsersManager } = require("../managers/users/UsersManager");
 const { MatchesManager } = require("../managers/matches/MatchesManager");
 const { BetUsersManager } = require("../managers/betusers/BetUsersManager");
 const { BetUser } = require("./BetUser");
+const { MediatorsManager } = require("../managers/mediators/MediatorsManager");
+const { Mediator } = require("./Mediator");
 
 class Guild {
     #rest;
@@ -24,7 +26,6 @@ class Guild {
         this.seasonId = data?.seasonId;
         this.blacklist = data?.blacklist;
         this.betsChannels = data?.betsChannels;
-        this.mediators = new Collection();
         this.#data = data;
         this.#rest = rest;
 
@@ -32,6 +33,7 @@ class Guild {
         this.betUsers = new BetUsersManager(rest, this.id);
         this.bets = new BetsManager(rest, this.id);
         this.matches = new MatchesManager(rest, this.id);
+        this.mediators = new MediatorsManager(rest, this.id);
 
         this.#init();
     }
@@ -39,26 +41,30 @@ class Guild {
     #init() {
         const id = this.id;
         for (let user of this.#data?.users ?? []) {
+            if (!user || !user.id) continue;
             this.users.set(user?.id, new User(user, this.#rest, id));
             this.#rest.users.set(user?.id, new User(user, this.#rest, id));
         }
 
         for (let user of this.#data?.betUsers ?? []) {
+            if (!user || !user.id) continue;
             this.betUsers.set(user?.id, new BetUser(user, this.#rest, id));
             this.#rest.betUsers.set(user?.id, new BetUser(user, this.#rest, id));
         }
 
         for (let bet of this.#data?.bets ?? []) {
+            if (!bet || !bet._id) continue;
             this.bets.set(bet?._id, new Bet(bet, this.#rest, id));
             this.#rest.bets.set(bet?._id, new Bet(bet, this.#rest, id));
         }
         for (let match of this.#data?.matches ?? []) {
+            if (!match || !match._id) continue;
             this.matches.set(match?._id, new Match(match, this.#rest, id));
             this.#rest.matches.set(match?._id, new Match(match, this.#rest, id));
         }
         for (let mediator of this.#data.mediators) {
             if (!mediator || !mediator.id) continue;
-            this.mediators.set(mediator.id, mediator);
+            this.mediators.set(mediator.id, new Mediator(mediator, this.#rest, id));
         }
         return this.#autoClean();
     }
@@ -82,28 +88,6 @@ class Guild {
             this.#rest.emit("guildUpdate", response);
             return value;
         }
-        if (key == "mediators") {
-            assert(typeof value == "object", "Value must an object");
-            assert(value.name, "Value name must be presentt");
-            assert(value.id, "Value id must be present");
-            assert(value.paymentLinks && typeof value.paymentLinks == "object", "Value paymentLinks and an object must be present");
-
-            const route = Routes.guilds.resource("mediators", this.id);
-            const response = await this.#rest.request('POST', route, value);
-
-            this.mediators.clear();
-            for (let mediator of response) {
-                if (!mediator || !mediator.id) continue;
-                this.mediators.set(mediator.id, mediator);
-            }
-
-            this.#rest.emit("guildUpdate", response);
-            console.log({
-                mediatorsAveilablre: this.mediators
-            });
-
-            return this.mediators;
-        }
 
         const response = await this.#rest.request('PATCH', route, { [key]: value });
 
@@ -113,25 +97,6 @@ class Guild {
     }
 
     async remove(key, value) {
-        if (key == "mediators") {
-            assert(typeof value == "object", "Value must an object");
-
-            const route = Routes.guilds.resource("mediators", this.id);
-            const response = await this.#rest.request('DELETE', route, value);
-
-            this.mediators.clear();
-            for (let mediator of response) {
-                if (!mediator || !mediator.id) continue;
-                this.mediators.set(mediator.id, mediator);
-            }
-
-            this.#rest.emit("guildUpdate", response);
-            console.log({
-                medsAfterDelete: this.mediators
-            });
-
-            return this.mediators;
-        }
         const route = Routes.guilds.resource(key, this.id);
         const response = await this.#rest.request('DELETE', route, { [key]: value });
         this[key] = response;

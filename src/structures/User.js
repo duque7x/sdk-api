@@ -16,7 +16,7 @@ class User {
     this.mvps = data.mvps;
     this.losses = data.losses;
     this.gamesPlayed = data.gamesPlayed;
-    this.blacklisted = data.blacklisted;
+    this.blacklist = data.blacklist;
     this.protections = data.protections;
     this.originalChannels = data.originalChannels;
     this.#rest = rest;

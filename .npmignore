@@ -5,7 +5,7 @@ node_modules
 .vscode
 *.log
 *.test.js
-__tests__/
+tests/
 coverage/
 
 # Ignore configs not needed at runtime

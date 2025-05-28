@@ -16,7 +16,7 @@ exports.BetUser = class {
     this.mvps = data?.mvps;
     this.losses = data?.losses;
     this.betsPlayed = data?.betsPlayed;
-    this.blacklisted = data?.blacklisted;
+    this.blacklist = data?.blacklist;
     this.#rest = rest;
     this.#data = data;
 

@@ -15,6 +15,19 @@ module.exports = {
         deleteAll: () => `/guilds`,
         resource: (resourceName, guildId) => `/guilds/${guildId}/${resourceName}`,
 
+        mediators: {
+            getAll: guildId => `/guilds/${guildId}/mediators`,
+            get: (userId, guildId) => `/guilds/${guildId}/mediators/${userId}`,
+
+            create: guildId => `/guilds/${guildId}/mediators`,
+            update: (userId, guildId) => `/guilds/${guildId}/mediators/${userId}`,
+
+            delete: (userId, guildId) => `/guilds/${guildId}/mediators/${userId}`,
+            deleteAll: guildId => `/guilds/${guildId}/mediators`,
+
+            resource: (guildId, userId, ...resources) => `/guilds/${guildId}/mediators/${userId}/${resources.join("/")}`,
+        },
+
         users: {
             getAll: guildId => `/guilds/${guildId}/users`,
             get: (userId, guildId) => `/guilds/${guildId}/users/${userId}`,

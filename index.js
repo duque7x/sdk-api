@@ -33,6 +33,11 @@ const STATES = {
   WAITING: "waiting",
 }
 
+const BASESTATUS = {
+  ON: "on",
+  OFF: "on",
+}
+
 exports.REST = REST;
 
 exports.MatchesManager;
@@ -47,6 +52,7 @@ exports.User = User;
 exports.BetUser = BetUser;
 
 exports.STATES = STATES;
+exports.BASESTATUS = BASESTATUS;
 exports.MATCHTYPES = MATCHTYPES;
 exports.BETTYPES = BETTYPES;
 exports.Collection = Collection;

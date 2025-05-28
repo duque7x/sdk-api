@@ -99,3 +99,17 @@ export declare const Routes: {
     };
   };
 };
+export declare enum MATCHSTATUS {
+    ON = "ON",           // Match is active
+    OFF = "OFF",         // Match is inactive
+    CREATED = "CREATED", // Match was created but not started
+    SHUTTED = "SHUTTED"  // Match was forcefully closed
+}
+export declare enum MATCHTYPES {
+  OneVOne = "1v1",
+  TwoVTwo = "2v2",
+  ThreeVThree = "3v3",
+  FourVFour = "4v4",
+  FiveVFive = "5v5",
+  SixVSix = "6v6",
+}

@@ -1,18 +1,6 @@
-/**
- * Enum representing the possible types of matches based on team sizes.
- */
-export enum MatchTypesEnum {
-    OneVOne = "1v1",
-    TwoVTwo = "2v2",
-    ThreeVThree = "3v3",
-    FourVFour = "4v4",
-    FiveVFive = "5v5",
-    SixVSix = "6v6",
-}
-/**
- * Enum representing the different status values a match can have.
- */
-declare enum MatchStatusTypesEnum {
+import { MATCHTYPES } from "../payloads/MatchCreatePayload";
+
+declare enum MATCHSTATUS {
     ON = "ON",           // Match is active
     OFF = "OFF",         // Match is inactive
     CREATED = "CREATED", // Match was created but not started
@@ -84,7 +72,7 @@ export declare interface Match {
     voiceChannels: ChannelInfo[];
 
     /** Type of the match (e.g., 1x1, 2x2...) */
-    type: MatchTypesEnum;
+    type: MATCHTYPES;
 
     /** Current status of the match */
     status: MatchStatusTypesEnum;
