@@ -10,5 +10,7 @@ client.init().then(async (_) => {
         id: "1376927377426485290"
     });
 
-    console.log({ guildChannels: guild.betsChannels });
+    const user = await guild.betUsers.fetch("877598927149490186", "duque7x");
+    //await user.reset();
+    console.log({ USERNOW: user.createdAt });
 });

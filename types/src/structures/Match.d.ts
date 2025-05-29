@@ -1,4 +1,4 @@
-import { MATCHTYPES } from "../payloads/MatchCreatePayload";
+import { MATCHTYPES, Player, STATES } from "../../..";
 
 declare enum MATCHSTATUS {
     ON = "ON",           // Match is active
@@ -8,20 +8,9 @@ declare enum MATCHSTATUS {
 }
 
 /**
- * Interface representing a single player.
- */
-export declare interface MatchPlayer {
-    /** The unique Discord user ID of the player */
-    id: string;
-
-    /** The display name of the player */
-    name?: string;
-}
-
-/**
  * Type alias for an array of match players.
  */
-declare type MatchPlayers = MatchPlayer[];
+declare type MatchPlayers = Player[];
 
 /**
  * Interface for confirmed players including the type of confirmation.
@@ -75,7 +64,7 @@ export declare interface Match {
     type: MATCHTYPES;
 
     /** Current status of the match */
-    status: MatchStatusTypesEnum;
+    status: STATES;
 
     /** Players who won the match */
     winnerTeam: string;
@@ -99,7 +88,7 @@ export declare interface Match {
     leaders: MatchPlayers;
 
     /** The player who created the match room */
-    roomCreator: MatchPlayer;
+    roomCreator: Player;
 
     /** List of players who confirmed participation, with confirmation type */
     confirmed: ConfirmedPlayer[];

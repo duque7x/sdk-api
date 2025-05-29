@@ -21,9 +21,6 @@ export declare type Players = Player[];
 
 export class BaseMatch {
     constructor(data: any, rest: REST, guildId: string): void;
-
-    createdAt: string;
-
     type: MATCHTYPES | BETTYPES | string;
 
     status: STATES;
@@ -37,4 +34,7 @@ export class BaseMatch {
     players: Players;
 
     guildId: string;
+
+    createdAt: Date;
+    updatedAt: Date;
 }

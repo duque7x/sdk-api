@@ -113,3 +113,15 @@ export declare enum MATCHTYPES {
   FiveVFive = "5v5",
   SixVSix = "6v6",
 }
+
+
+/**
+ * Interface representing a single player.
+ */
+export declare interface Player {
+  /** The unique Discord user ID of the player */
+  id: string;
+
+  /** The display name of the player */
+  name?: string;
+}

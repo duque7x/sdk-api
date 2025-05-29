@@ -95,5 +95,8 @@ type KeysAvailable = {
         id: string
     };
 
-    mediators: { name?: string, id: string, joinedAt?: Date, paymentLinks?: string[] }
+    mediators: { name?: string, id: string, joinedAt?: Date, paymentLinks?: string[] };
+
+    createdAt: Date;
+    updatedAt: Date;
 };

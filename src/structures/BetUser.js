@@ -17,6 +17,8 @@ exports.BetUser = class {
     this.losses = Number(data?.losses) || 0;
     this.betsPlayed = data?.betsPlayed || [];
     this.blacklist = data?.blacklist || false;
+    this.createdAt = new Date(data.createdAt);
+    this.updatedAt = new Date(data.updatedAt);
     this.#rest = rest;
     this.#data = data;
 
@@ -25,33 +27,6 @@ exports.BetUser = class {
   get data() {
     return this.#data;
   }
-  async reset(key) {
-    const payload = { id: this.id, name: this.name, guildId: this.guildId };
-    if (!key) {
-      const options = {
-        wins: 0,
-        credit: 0,
-        losses: 0,
-        mvps: 0,
-        betsPlayed: [],
-        blacklist: false,
-      };
-
-      for (let op in options) {
-        const route = Routes.guilds.betUsers.resource(this.id, op, this.guildId);
-        await this.#rest.request("DELETE", route, payload);
-
-        this[op] = options[op];
-      }
-      return this;
-    }
-    assert(key && typeof key === "string", "Key must be present");
-    const route = Routes.guilds.betUsers.resource(this.id, op, this.guildId);
-    const reset = await this.#rest.request("DELETE", route, payload);
-
-    this[key] = reset;
-    return this;
-  };
   async delete() {
     const route = Routes.guilds.betUsers.delete(this.id, this.guildId);
     const payload = { id: this.id, name: this.name, guildId: this.guildId };
@@ -92,7 +67,6 @@ exports.BetUser = class {
     this[key] = updatedField;
     return this;
   };
-
   async update(payload) {
     assert(payload && typeof payload === "object", "Payload must be an object");
     let finalPayload = {};
@@ -128,5 +102,15 @@ exports.BetUser = class {
 
     return this;
   }
-}
+  async reset(key) {
+    const keyMaps = { wins: 0, losses: 0, mvps: 0, betsPlayed: [], credit: 0, blacklist: false };
+    if (!key) return await this.update(keyMaps);
 
+    const payload = { [key]: keyMaps[key] };
+    const route = Routes.guilds.betUsers.resource(this.id, key, this.guildId);
+    const response = await this.#rest.request("DELETE", route, payload);
+
+    this[key] = response;
+    return this;
+  }
+}

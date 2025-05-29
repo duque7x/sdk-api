@@ -5,15 +5,17 @@ declare type MediatorData = {
     name: string;
     paymentLinks: string[];
     createdAt: Date;
+    updatedAt: Date;
 }
 
 export class Mediator {
     id: string;
     name: string;
     paymentLinks: string[];
-    createdAt: Date;
-    guildId: string;
 
+    guildId: string;
+    createdAt: Date;
+    updatedAt: Date;
     constructor(data: MediatorData, rest: REST, guildId: string);
     get data(): MediatorData;
 

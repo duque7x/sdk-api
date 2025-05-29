@@ -8,7 +8,8 @@ exports.Mediator = class {
         this.id = data?.id;
         this.name = data?.name;
         this.paymentLinks = data.paymentLinks;
-        this.createdAt = data?.createdAt;
+        this.createdAt = new Date(data.createdAt);
+        this.updatedAt = new Date(data.updatedAt);
 
         this.#rest = rest;
         this.#data = data;

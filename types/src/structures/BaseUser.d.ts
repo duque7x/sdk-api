@@ -7,7 +7,7 @@ export class BaseUser {
 
   name: string;
   id: string;
-  
+
   guildId: string;
   /**
  * The number of wins the player has.
@@ -32,4 +32,7 @@ export class BaseUser {
    * @default false
    */
   blacklisted: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
 }

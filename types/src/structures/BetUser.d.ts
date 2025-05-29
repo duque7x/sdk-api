@@ -31,7 +31,10 @@ type BetUserData = {
   wins?: number;
   betsPlayed?: string[];
 
-  type: string;
+  type?: string;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class BetUser extends BaseUser {
@@ -42,8 +45,6 @@ export class BetUser extends BaseUser {
 
   get data(): BetUserData;
 
-  reset<F extends keyof BetUserData>(key: F): Promise<BetUserData>;
-
   delete(): Promise<BetUserData>;
 
   add<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUserData>;
@@ -52,5 +53,9 @@ export class BetUser extends BaseUser {
 
   set<F extends keyof BetUserData, A = BetUserData[F]>(key: F | string, value: A): Promise<BetUserData>;
 
-  update(payload: BetUserData): Promise<BetUser>;
+  update(payload:  BetUserData): Promise<BetUser>;
+
+  reset(key: keyof BetUserData): Promise<BetUser>;
+
+  reset(): Promise<BetUser>;
 }

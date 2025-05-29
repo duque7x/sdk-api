@@ -22,6 +22,8 @@ class Guild {
         this.state = data?.state;
         this.pricesOn = data?.pricesOn;
         this.pricesAvailable = data?.pricesAvailable;
+        this.createdAt = new Date(data.createdAt);
+        this.updatedAt = new Date(data.updatedAt);
         this._id = data?._id;
         this.seasonId = data?.seasonId;
         this.blacklist = data?.blacklist;

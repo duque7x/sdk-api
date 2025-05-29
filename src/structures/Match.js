@@ -20,6 +20,8 @@ class Match {
         this.confirmed = data.confirmed;
         this.leaders = data.leaders;
         this._id = data._id;
+        this.createdAt = new Date(data.createdAt);
+        this.updatedAt = new Date(data.updatedAt);
         this.#data = data;
         this.#rest = rest;
 

@@ -32,7 +32,7 @@ client.init().then(async (_) => {
   console.log({ statusAfter: bet.status });
 
 
-bet.set("mediatorId")
+  bet.set("mediatorId")
   const me = guild.betUsers.cache.get("877598927149490186");
 
   await me.update({

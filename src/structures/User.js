@@ -19,6 +19,8 @@ class User {
     this.blacklist = data.blacklist;
     this.protections = data.protections;
     this.originalChannels = data.originalChannels;
+    this.createdAt =new Date (data.createdAt);
+    this.updatedAt = new Date(data.updatedAt);
     this.#rest = rest;
     this.#data = data;
 
