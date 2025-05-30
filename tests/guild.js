@@ -6,14 +6,16 @@ client.init().then(async (_) => {
 
   const before = Date.now();
   console.log(chalk.bgBlue(`Starting to fetch data....`));
-  const guild = await client.guilds.fetch("1336809872884371587");
+
+  const guild = await client.guilds.cache.get("1336809872884371587");
 
   //await guild.add("channels", { id: "1377933427587940412", type: "dailyRank" });
-  await guild.set("dailyRankStatus", BASESTATUS.ON);
+  //await guild.set("dailyRankStatus", BASESTATUS.ON);
 
   console.log({
     channs: guild.channels,
-    stats: guild.status
+    stats: guild.status,
+    users: guild.betUsers.cache
   });
 
   const now = Date.now();

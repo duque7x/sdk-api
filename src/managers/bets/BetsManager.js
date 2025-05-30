@@ -85,28 +85,6 @@ exports.BetsManager = class BetsManager {
         this.#bets.clear();
         return;
     };
-    async cacheBets() {
-        const FIVE_MINUTES = 5 * 60 * 1000;
-    
-        const requestBets = async () => {
-          const route = Routes.guilds.bets.getAll(this.guildId);
-          const bets = await this.#rest.request("GET", route);
-    
-          if (!bets || bets.error) return new Collection();
-          for (const betData of bets) {
-            const bet = new Bet(betData, this.#rest, this.guildId);
-            this.#setBet(bet);
-          }
-        };
-        await requestBets();
-    
-        setInterval(() => {
-          requestBets().then(() => {
-            console.log(`[CACHE] Refreshed active bets`);
-          }).catch(console.error); // avoid unhandled rejections
-        }, FIVE_MINUTES);
-        return this.#bets;
-      }
     #removeIdFromCache(id) {
         this.#bets.delete(id);
     }

@@ -27,7 +27,7 @@ class Guild {
         this._id = data?._id;
         this.seasonId = data?.seasonId;
         this.blacklist = data?.blacklist;
-        this.betsChannels = {
+        this.betsChannels = data?.betsChannels == undefined ? {} : {
             "1v1": data?.betsChannels["1v1"],
             "2v2": data?.betsChannels["2v2"],
             "3v3": data?.betsChannels["3v3"],
@@ -44,41 +44,7 @@ class Guild {
         this.bets = new BetsManager(rest, this.id);
         this.matches = new MatchesManager(rest, this.id);
         this.mediators = new MediatorsManager(rest, this.id);
-
-        this.#init();
     }
-
-    #init() {
-        const id = this.id;
-        for (let user of this.#data?.users ?? []) {
-            if (!user || !user.id) continue;
-            this.users.set(user?.id, new User(user, this.#rest, id));
-            this.#rest.users.set(user?.id, new User(user, this.#rest, id));
-        }
-
-        for (let user of this.#data?.betUsers ?? []) {
-            if (!user || !user.id) continue;
-            this.betUsers.set(user?.id, new BetUser(user, this.#rest, id));
-            this.#rest.betUsers.set(user?.id, new BetUser(user, this.#rest, id));
-        }
-
-        for (let bet of this.#data?.bets ?? []) {
-            if (!bet || !bet._id) continue;
-            this.bets.set(bet?._id, new Bet(bet, this.#rest, id));
-            this.#rest.bets.set(bet?._id, new Bet(bet, this.#rest, id));
-        }
-        for (let match of this.#data?.matches ?? []) {
-            if (!match || !match._id) continue;
-            this.matches.set(match?._id, new Match(match, this.#rest, id));
-            this.#rest.matches.set(match?._id, new Match(match, this.#rest, id));
-        }
-        for (let mediator of this.#data.mediators ?? []) {
-            if (!mediator || !mediator.id) continue;
-            this.mediators.set(mediator.id, new Mediator(mediator, this.#rest, id));
-        }
-        return this.#autoClean();
-    }
-
     get data() {
         return this.#data;
     }
@@ -131,16 +97,10 @@ class Guild {
                 matchesStatus: "matches",
                 betsStatus: "bets"
             }
-            
-            
             const route = Routes.fields(Routes.guilds.resource("status", this.id), statusMaps[key]);
-            console.log({
-               route,
-               kw: statusMaps[key] 
-            });
             const response = await this.#rest.request('PATCH', route, { status: value });
             this.status[statusMaps[key]] = response;
-            
+
             this.#rest.emit("guildUpdate", this);
             return this.status;
         }
@@ -153,6 +113,66 @@ class Guild {
     #autoClean() {
         this.pricesOn = [...new Set(this.pricesOn ?? [])].sort((a, b) => a - b);
         this.pricesAvailable = [...new Set(this.pricesAvailable ?? [])].sort((a, b) => a - b);
+    }
+
+    async updateInternals() {
+        this.#autoClean();
+        const baseRoute = Routes.guilds.get(this.id);
+
+        const requisition = async () => {
+            try {
+                const [users, betUsers, bets, matches, mediators] = await Promise.all([
+                    this.#rest.request("GET", Routes.fields(baseRoute, "users")),
+                    this.#rest.request("GET", Routes.fields(baseRoute, "betUsers")),
+                    this.#rest.request("GET", Routes.fields(baseRoute, "bets")),
+                    this.#rest.request("GET", Routes.fields(baseRoute, "matches")),
+                    this.#rest.request("GET", Routes.fields(baseRoute, "mediators"))
+                ]);
+                this.setstuff(users, betUsers, bets, matches, mediators);
+            } catch (error) {
+                console.error(`Erro ao atualizar dados da guilda ${this.id}:`, error);
+            }
+        };
+
+        const FIVE_MINUTES = 5 * 60 * 1000;
+        await requisition();
+        setInterval(() => requisition(), FIVE_MINUTES);
+    }
+
+    setstuff(users, betUsers, bets, matches, mediators) {
+        for (let user of users ?? []) {
+            if (!user || !user.id) continue;
+            const instance = new User(user, this.#rest, this.id);
+            this.users.set(user.id, instance);
+            this.#rest.users.set(user.id, instance);
+        }
+
+        for (let user of betUsers ?? []) {
+            if (!user || !user.id) continue;
+            const instance = new BetUser(user, this.#rest, this.id);
+            let oe = this.betUsers.set(user.id, instance);
+            this.#rest.betUsers.set(user.id, instance);
+        }
+
+        for (let bet of bets ?? []) {
+            if (!bet || !bet._id) continue;
+            const instance = new Bet(bet, this.#rest, this.id);
+            this.bets.set(bet._id, instance);
+            this.#rest.bets.set(bet._id, instance);
+        }
+
+        for (let match of matches ?? []) {
+            if (!match || !match._id) continue;
+            const instance = new Match(match, this.#rest, this.id);
+            this.matches.set(match._id, instance);
+            this.#rest.matches.set(match._id, instance);
+        }
+
+        for (let mediator of mediators ?? []) {
+            if (!mediator || !mediator.id) continue;
+            const instance = new Mediator(mediator, this.#rest, this.id);
+            this.mediators.set(mediator.id, instance);
+        }
     }
 }
 

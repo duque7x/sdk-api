@@ -97,29 +97,6 @@ class UsersManager {
 
     return user;
   }
-  async cacheUsers() {
-    const FIVE_MINUTES = 5 * 60 * 1000;
-
-    const requestUsers = async () => {
-      const route = Routes.guilds.users.getAll(this.guildId);
-      const users = await this.#rest.request("GET", route);
-
-      if (!users || users.error) return new Collection();
-      for (const userData of users) {
-        const user = new User(userData, this.#rest, this.guildId);
-        this.#setUser(user);
-      }
-    };
-    await requestUsers();
-
-    setInterval(() => {
-      requestUsers().then(() => {
-        console.log(`[CACHE] Refreshed active users`);
-      }).catch(console.error); // avoid unhandled rejections
-    }, FIVE_MINUTES);
-    return this.#users;
-  }
-  
   #setUser(user) {
     if (this.#users.has(user.id)) this.#removeIdFromCache(user.id);
     return this.#users.set(user.id, user);

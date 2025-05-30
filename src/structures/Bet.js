@@ -46,19 +46,17 @@ class Bet {
     async add(field, amount) {
         const route = Routes.guilds.bets.resource(this.guildId, this._id, field.toLowerCase());
         if (field === "channels") {
-            console.log({ field, amount });
-
             const payload = { channel: amount };
             const updatedField = await this.#rest.request("PATCH", route, payload);
 
-            this[amount.type] = { id: updatedField.id };
+            this.channels[amount.type] = { id: updatedField.id };
 
             return updatedField;
         }
         const updatedField = await this.#rest.request("PATCH", route, { [field]: amount }
         );
 
-        this[field] = updatedField;
+        this.channels[field] = updatedField;
         return this[field];
     };
 
@@ -136,10 +134,6 @@ class Bet {
 
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "channels");
         const response = await this.#rest.request("PATCH", route, payload);
-        console.log({
-
-        });
-
         this.channels = response;
         return response;
     }

@@ -24,7 +24,8 @@ class BetUsersManager {
   set(id, user) {
     assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
     assert(user && user instanceof BetUser, `${user} must be an instance of BetUser`);
-    this.#setUser(user);
+
+    return this.#setUser(user);
   }
 
   async fetch(id, name) {
@@ -106,7 +107,7 @@ class BetUsersManager {
     this.#betUsers.delete(id);
   }
   #setUser(user) {
-    if (this.#betUsers.has(user.id)) this.#removeIdFromCache(user.id);
+    if (this.#betUsers.get(user.id)) this.#removeIdFromCache(user.id);
     return this.#betUsers.set(user.id, user);
   }
 }

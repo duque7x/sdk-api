@@ -20,7 +20,7 @@ exports.BetUser = class {
     this.createdAt = new Date(data.createdAt) ?? new Date();
     this.updatedAt = new Date(data.updatedAt) ?? new Date();
 
-    this.coins = Number(data?.coins) ?? 0;
+    this.coins = data?.coins ? Number(data?.coins) : 0;
     this.dailyWins = data?.dailyWins ?? { amount: 0, date: new Date() };
 
     this.#rest = rest;
@@ -83,6 +83,7 @@ exports.BetUser = class {
         if (key == "wins") finalPayload.wins = Math.max(0, this.wins + payload.wins);
         if (key == "mvps") finalPayload.mvps = Math.max(0, this.mvps + payload.mvps);
         if (key == "credit") finalPayload.credit = Math.max(0, this.credit + payload.credit);
+        if (key == "coins") finalPayload.coins = Math.max(0, this.coins + payload.coins);
 
         if (key == "betsPlayed") {
           finalPayload.betsPlayed = [...this.betsPlayed]; // Start with existing bets
@@ -107,7 +108,7 @@ exports.BetUser = class {
     return this;
   }
   async reset(key) {
-    const keyMaps = { wins: 0, losses: 0, mvps: 0, betsPlayed: [], credit: 0, blacklist: false };
+    const keyMaps = { wins: 0, losses: 0, mvps: 0, betsPlayed: [], credit: 0, blacklist: false, coins: 0 };
     if (!key) return await this.update(keyMaps);
 
     const payload = { [key]: keyMaps[key] };

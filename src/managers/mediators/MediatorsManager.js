@@ -96,30 +96,6 @@ exports.MediatorsManager = class MediatorsManager {
 
     return mediator;
   }
-  async cacheMediators() {
-    const FIVE_MINUTES = 5 * 60 * 1000;
-
-    const requestMediators = async () => {
-      const route = Routes.guilds.mediators.getAll(this.guildId);
-      const mediators = await this.#rest.request("GET", route);
-
-      if (!mediators || mediators.error) return new Collection();
-      this.#mediators.clear();
-      for (const mediatorData of mediators) {
-        const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
-
-        this.#setMediator(mediator);
-      }
-    };
-    await requestMediators();
-
-    setInterval(() => {
-      requestMediators().then(() => {
-        console.log(`[CACHE] Refreshed active mediators`);
-      }).catch(console.error); // avoid unhandled rejections
-    }, FIVE_MINUTES);
-    return this.#mediators;
-  }
   #setMediator(mediator) {
     if (this.#mediators.has(mediator.id)) this.#removeIdFromCache(mediator.id);
     return this.#mediators.set(mediator.id, mediator);
