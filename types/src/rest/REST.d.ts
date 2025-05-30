@@ -38,4 +38,5 @@ export declare class REST extends EventEmitter {
 
     on<K extends keyof EventMap>(eventName: K, listener: (args: EventMap[K]) => void): this;
     on(eventName: "userCreate", listener: (args: User) => void): this;
+    on(eventName: "guildUpdate", listener: (args: Guild) => void): this;
 }

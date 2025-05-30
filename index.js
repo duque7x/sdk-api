@@ -35,7 +35,13 @@ const STATES = {
 
 const BASESTATUS = {
   ON: "on",
-  OFF: "on",
+  OFF: "off",
+}
+
+const GUILDSTATUS = {
+  bets: "on" || "off",
+  matches: "on" || "off",
+  dailyRank: "on" || "off",
 }
 
 exports.REST = REST;
@@ -55,5 +61,6 @@ exports.STATES = STATES;
 exports.BASESTATUS = BASESTATUS;
 exports.MATCHTYPES = MATCHTYPES;
 exports.BETTYPES = BETTYPES;
+exports.GUILDSTATUS = GUILDSTATUS;
 exports.Collection = Collection;
 exports.Routes = require("./src/rest/Routes");

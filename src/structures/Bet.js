@@ -11,23 +11,24 @@ class Bet {
      */
     constructor(data, rest, guildId) {
         this.players = data?.players ?? [];
-        this.price = data?.price;
-        this.payedBy = data?.payedBy;
-        this.createdAt = new Date(data.createdAt);
-        this.updatedAt = new Date(data.updatedAt);
+        this.price = data?.price ?? 1;
+        this.payedBy = data?.payedBy ?? [];
+        this.createdAt = new Date(data.createdAt)?? new Date();
+        this.updatedAt = new Date(data.updatedAt) ?? new Date();
 
-        this.channels = data?.channels;
-        this.winner = data?.winner;
-        this.loser = data?.loser;
+        this.channels = data?.channels ?? [];
+        this.winner = data?.winner ?? "";
+        this.loser = data?.loser ?? "";
 
-        this.type = data?.type;
-        this.status = data?.status;
-        this.maximumSize = data?.maximumSize;
-        this.teamA = data?.teamA;
-        this.teamB = data?.teamB;
-        this.creatorId = data?.creatorId;
-        this.mediatorId = data?.mediatorId;
-        this.confirmed = data?.confirmed;
+        this.type = data?.type ?? "4v4";
+        this.status = data?.status ?? "created";
+        this.maximumSize = data?.maximumSize ?? 2;
+        this.teamA = data?.teamA ?? [];
+        this.teamB = data?.teamB ?? [];
+        this.creatorId = data?.creatorId ?? "";
+        this.embedMessageId = data?.embedMessageId ?? "";
+        this.mediatorId = data?.mediatorId ?? "";
+        this.confirmed = data?.confirmed ?? [];
         this._id = data?._id;
 
         this.#rest = rest;

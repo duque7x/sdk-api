@@ -19,7 +19,7 @@ class Guild {
         this.prefix = data?.prefix;
         this.id = data?.id;
         this.name = data?.name;
-        this.state = data?.state;
+        this.status = data?.status;
         this.pricesOn = data?.pricesOn;
         this.pricesAvailable = data?.pricesAvailable;
         this.createdAt = new Date(data.createdAt);
@@ -33,6 +33,9 @@ class Guild {
             "3v3": data?.betsChannels["3v3"],
             "4v4": data?.betsChannels["4v4"],
         };
+        this.channels = data?.channels ? {
+            "dailyRank": data?.channels["dailyRank"] ?? ""
+        } : {};
         this.#data = data;
         this.#rest = rest;
 
@@ -90,12 +93,23 @@ class Guild {
             assert(typeof value == "object", "Value must an object");
             assert(value.type, "Value type must be presentt");
             assert(value.id, "Value id must be present");
+
             const response = await this.#rest.request('PATCH', route, value);
             this[key] = response;
             this.#rest.emit("guildUpdate", response);
-            return value;
+            return response;
         }
+        if (key === "status") {
+            assert(typeof value == "object", "Value must an object");
+            assert(value.type, "Value type must be presentt");
+            assert(value.value, "Value value must be present");
 
+            const payload = { status: value.value }
+            const response = await this.#rest.request('PATCH', Routes.fields(route, value.type), payload);
+            this[key] = response;
+            this.#rest.emit("guildUpdate", response);
+            return response;
+        }
         const response = await this.#rest.request('PATCH', route, { [key]: value });
 
         this[key] = response;
@@ -111,10 +125,29 @@ class Guild {
     }
 
     async set(key, value) {
+        if (key == "dailyRankStatus" || key == "matchesStatus" || key == "betsStatus") {
+            const statusMaps = {
+                dailyRankStatus: "dailyRank",
+                matchesStatus: "matches",
+                betsStatus: "bets"
+            }
+            
+            
+            const route = Routes.fields(Routes.guilds.resource("status", this.id), statusMaps[key]);
+            console.log({
+               route,
+               kw: statusMaps[key] 
+            });
+            const response = await this.#rest.request('PATCH', route, { status: value });
+            this.status[statusMaps[key]] = response;
+            
+            this.#rest.emit("guildUpdate", this);
+            return this.status;
+        }
         const route = Routes.guilds.resource(key, this.id);
         const response = await this.#rest.request('PATCH', route, { set: value });
         this[key] = response;
-        return value;
+        return this.status;
     }
 
     #autoClean() {

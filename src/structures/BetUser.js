@@ -9,16 +9,20 @@ exports.BetUser = class {
    * @param {*} data 
    */
   constructor(data, rest, guildId) {
-    this.id = data?.id || "";
-    this.name = data?.name || "";
-    this.credit = Number(data?.credit) || 0;
-    this.wins = Number(data?.wins) || 0;
-    this.mvps = Number(data?.mvps) || 0;
-    this.losses = Number(data?.losses) || 0;
-    this.betsPlayed = data?.betsPlayed || [];
-    this.blacklist = data?.blacklist || false;
-    this.createdAt = new Date(data.createdAt);
-    this.updatedAt = new Date(data.updatedAt);
+    this.id = data?.id ?? "";
+    this.name = data?.name ?? "";
+    this.credit = Number(data?.credit) ?? 0;
+    this.wins = Number(data?.wins) ?? 0;
+    this.mvps = Number(data?.mvps) ?? 0;
+    this.losses = Number(data?.losses) ?? 0;
+    this.betsPlayed = data?.betsPlayed ?? [];
+    this.blacklist = data?.blacklist ?? false;
+    this.createdAt = new Date(data.createdAt) ?? new Date();
+    this.updatedAt = new Date(data.updatedAt) ?? new Date();
+
+    this.coins = Number(data?.coins) ?? 0;
+    this.dailyWins = data?.dailyWins ?? { amount: 0, date: new Date() };
+
     this.#rest = rest;
     this.#data = data;
 

@@ -21,6 +21,7 @@ export interface BetData {
     confirmed: Confirmed[];
     channels: Channel[];
     status: STATES;
+    embedMessageId: string;
     winner: string;
     loser: string;
     teamA: string;
@@ -41,6 +42,7 @@ export declare class Bet extends BaseMatch {
     confirmed: Confirmed[];
     channels: Channel[];
     status: STATES;
+    embedMessageId: string;
     winner: string;
     loser: string;
     teamA: string;

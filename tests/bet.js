@@ -14,10 +14,10 @@ client.init().then(async (_) => {
   // await bet.setLoser("1044050359586394192");
   // await bet.addPlayer({ id: "877598927149490186", name: "dqu" });
   // await bet.addChannel({ id: "877598927149490186", type: "wdwdwdwdwd" })
-
+ await bet.add("embedMessageId", "1377731184095789086")
   const channel = bet.channels.find(ew => ew.type.toLowerCase() === "wdwdwdwdwd");
-  const { status, channels, winner, loser, players } = bet;
-  console.log({ /* status, channels, winner, loser, players */ channel });
+  const { status, channels, winner, loser, players,   embedMessageId } = bet;
+  console.log({ /* status, channels, winner, loser, players */ channel, embedMessageId });
 
   const now = Date.now();
   console.log(`It took`, chalk.bgRed(`${now - before}ms`), "to fetch all data.");

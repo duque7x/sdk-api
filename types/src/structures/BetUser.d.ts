@@ -35,11 +35,19 @@ type BetUserData = {
 
   createdAt?: Date;
   updatedAt?: Date;
+  coins?: number;
+  dailyWins?: DailyWins;
 }
 
+type DailyWins = {
+  amount: number;
+  date: Date;
+}
 export class BetUser extends BaseUser {
   credit: number;
   betsPlayed?: string[];
+  coins: number;
+  dailyWins: DailyWins;
 
   constructor(data: BetUserData, rest: REST, guildId: string);
 
@@ -53,7 +61,7 @@ export class BetUser extends BaseUser {
 
   set<F extends keyof BetUserData, A = BetUserData[F]>(key: F | string, value: A): Promise<BetUserData>;
 
-  update(payload:  BetUserData): Promise<BetUser>;
+  update(payload: BetUserData): Promise<BetUser>;
 
   reset(key: keyof BetUserData): Promise<BetUser>;
 

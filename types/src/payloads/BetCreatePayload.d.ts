@@ -17,4 +17,5 @@ export type BetCreatePayload  = {
     creatorId: string;
     adminId: string;
     price: number;
+    embedMessageId?: string;
 }
