@@ -33,7 +33,7 @@ exports.GuildsManager = class GuildsManager {
         const response = await this.#rest.request("GET", route);
         const guild = new Guild(response, this.#rest);
 
-         guild.setstuff(response.users, response.betUsers, response.bets, response.macthes, response.mediators);
+        guild.setstuff(response.users, response.betUsers, response.bets, response.macthes, response.mediators);
 
         if (this.#guilds.has(guild.id)) {
             this.#removeIdFromCache(id);
@@ -110,7 +110,7 @@ exports.GuildsManager = class GuildsManager {
                 if (!guildData.id) continue;
 
                 const guild = new Guild(guildData, this.#rest);
-                await guild.updateInternals();
+                guild.setstuff(guildData.users, guildData.betUsers, guildData.bets, guildData.macthes, guildData.mediators);
                 this.set(guildData.id, guild);
             }
         };

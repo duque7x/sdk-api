@@ -13,9 +13,7 @@ client.init().then(async (_) => {
   //await guild.set("dailyRankStatus", BASESTATUS.ON);
 
   console.log({
-    channs: guild.channels,
-    stats: guild.status,
-    users: guild.betUsers.cache
+    users: guild.betUsers.cache.map(u => u.wins).sort((a, b) => a - b)
   });
 
   const now = Date.now();

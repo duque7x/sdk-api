@@ -5,7 +5,7 @@ class Collection extends Map {
     }
     at(index) {
         if (index < 0 || index >= this.size) {
-            return undefined; 
+            return undefined;
         }
 
         let i = 0;
@@ -46,6 +46,13 @@ class Collection extends Map {
     }
     toJSON() {
         return this.map((val) => val.toJSON ? val.toJSON() : val);
+    }
+    sort(compareFunction) {
+        const sortedEntries = [...this.entries()].sort((a, b) => {
+            return compareFunction(a[1], b[1], a[0], b[0], this); // a[1]=value, a[0]=key
+        });
+
+        return new Collection(sortedEntries);
     }
 }
 
