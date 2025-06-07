@@ -2,7 +2,7 @@
 require("dotenv").config();
 const { GuildsManager } = require("../managers/guilds/GuildsManager");
 const Routes = require("../rest/Routes");
-const { request } = require('undici');
+const { request, Headers } = require('undici');
 const { EventEmitter } = require("node:events");
 const { Collection } = require("../structures/Collection");
 
@@ -25,21 +25,20 @@ exports.REST = class extends EventEmitter {
     return await this.#requester(method, Routes.base + path, data);
   }
 
-  async #requester(method, url, data) {
-    const headers = {
-      "X-Duque-Auth": process.env.AUTH,
-      'Content-Type': 'application/json',
-    };
-    const options = {
-      method,
-      headers,
-      body: data !== undefined ? JSON.stringify(data) : undefined,
-    };
+  async #requester(method, url, sendData) {
     try {
-      const res = await request(url, options);
+      const headers = new Headers()
+      headers.append("duque-auth", process.env.AUTH);
+      headers.append("Content-Type", 'application/json');
+
+      const res = await request(url, {
+        method,
+        headers,
+        body: sendData !== undefined ? JSON.stringify(sendData) : undefined,
+      });
       const { data, message } = await res.body.json();
-      if (message) console.log({message});      
-     // console.log(`Response data`, { data }, `Message: `, { message });
+      if (message) console.log({ message });
+      // console.log(`Response data`, { data }, `Message: `, { message });
       return data;
     } catch (error) {
       if (error instanceof Error) console.error('Error:', error.message);
