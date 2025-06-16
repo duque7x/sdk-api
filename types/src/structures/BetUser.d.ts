@@ -31,7 +31,7 @@ type BetUserData = {
   wins?: number;
   betsPlayed?: string[];
 
-  type?: string;
+  type?: "add" | "remove" | string;
 
   createdAt?: Date;
   updatedAt?: Date;

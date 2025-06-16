@@ -56,6 +56,8 @@ exports.MatchesManager = class MatchesManager {
     const reponse = await this.#rest.request('POST', route, payload);
     const match = new Match(reponse, this.#rest, this.guildId);
     this.#setMatch(match);
+
+    return match;
   }
 
   #setMatch(match) {

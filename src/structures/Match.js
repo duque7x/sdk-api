@@ -54,23 +54,30 @@ class Match {
         }
         if (typeof key !== "string") throw new Error("key must be a string");
         const route = Routes.guilds.matches.resource(this._id, key.toLowerCase(), this.guildId);
-        const reset = await this.#rest.request("DELETE", route);
-        this[key] = reset;
+        const updatedData = await this.#rest.request("DELETE", route);
+        this.#updateInternals(updatedData);
 
         return this;
     };
     async delete() {
         const route = Routes.guilds.matches.resource(this._id, key.toLowerCase(), this.guildId);
-        await this.#rest.request("DELETE", route);
+        const updatedData = await this.#rest.request("DELETE", route);
+        this.#updateInternals(updatedData);
         return;
     };
     async addPlayer(id, name) {
         if (!id) throw new Error("no id was provided")
         const route = Routes.guilds.matches.resource(this._id, "players", this.guildId);
-        const response = await this.#rest.request("post", route, { id, name });
+        const updatedData = await this.#rest.request("post", route, { id, name });
 
-        this.players = response;
+        this.#updateInternals(updatedData);
         return;
+    }
+    #updateInternals(data) {
+        for (let key in data) {
+            if (key == "id" || key == "_id" || key == "guildId") continue;
+            if (this[key]) this[key] = data[key];
+        }
     }
 }
 

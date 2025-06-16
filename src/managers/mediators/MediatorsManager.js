@@ -25,7 +25,7 @@ exports.MediatorsManager = class MediatorsManager {
     const route = Routes.guilds.mediators.create(this.guildId);
     const response = await this.#rest.request("POST", route, payload);
 
-    for (let mediatorData of response) {
+    for (let mediatorData of response.mediators) {
       const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
       this.#setMediator(mediator);
       if (mediatorData.id == payload.id) {

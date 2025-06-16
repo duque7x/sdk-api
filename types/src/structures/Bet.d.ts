@@ -13,6 +13,10 @@ export interface Channel {
     id: string;
     type: string;
 }
+export interface Message {
+    id: string;
+    type: string;
+}
 export interface BetData {
     type: BETTYPES;
     price: number;
@@ -20,6 +24,7 @@ export interface BetData {
     mediatorId: string;
     confirmed: Confirmed[];
     channels: Channel[];
+    messages: Message[];
     status: STATES;
     embedMessageId: string;
     winner: string;
@@ -41,6 +46,7 @@ export declare class Bet extends BaseMatch {
     mediatorId: string;
     confirmed: Confirmed[];
     channels: Channel[];
+    messages: Message[];
     status: STATES;
     embedMessageId: string;
     winner: string;
@@ -71,5 +77,6 @@ export declare class Bet extends BaseMatch {
     setLoser(userId: string): Promise<string>;
 
     addChannel(payload: Channel): Promise<Channel>;
+    addMessage(payload: Message): Promise<Message>;
     setChannels(channels: Channel[]): Promise<Channel[]>;
 }

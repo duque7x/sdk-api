@@ -1,4 +1,3 @@
-// src/rest/index.js
 require("dotenv").config();
 const { GuildsManager } = require("../managers/guilds/GuildsManager");
 const Routes = require("../rest/Routes");
@@ -17,6 +16,7 @@ exports.REST = class extends EventEmitter {
     this.matches = new Collection();
     this.bets = new Collection();
   }
+
   async init() {
     await this.guilds.cacheGuilds();
   }
@@ -26,24 +26,46 @@ exports.REST = class extends EventEmitter {
   }
 
   async #requester(method, url, sendData) {
-    try {
-      const headers = new Headers()
-      headers.append("duque-auth", process.env.AUTH);
-      headers.append("Content-Type", 'application/json');
-
-      const res = await request(url, {
-        method,
-        headers,
-        body: sendData !== undefined ? JSON.stringify(sendData) : undefined,
-      });
-      const { data, message } = await res.body.json();
-      if (message) console.log({ message });
-      // console.log(`Response data`, { data }, `Message: `, { message });
-      return data;
-    } catch (error) {
-      if (error instanceof Error) console.error('Error:', error.message);
-      else console.error('Unexpected error occurred:', error);
-      return { error: true, message: error.message || 'Unknown error' };
-    }
+    const { data } = await doShit(method, url, sendData);
+    return data;
   };
+}
+
+async function doShit(method, url, dataToSend) {
+  const makeRequest = async () => {
+    const headers = new Headers();
+    headers.append("duque-auth", process.env.AUTH);
+    headers.append("Content-Type", "application/json");
+
+    const res = await request(url, {
+      method,
+      headers,
+      body: dataToSend !== undefined ? JSON.stringify(dataToSend) : undefined,
+    });
+
+    const body = await res.body.json();
+    const { data, message } = body;
+
+    if (message) console.log({ message });
+    return { data, message };
+  };
+
+  try {
+    return await makeRequest();
+  } catch (error) {
+    console.error("Initial request failed:", error.message || error);
+
+    let tries = 0;
+    while (tries < 3) {
+      tries++;
+      await new Promise(resolve => setTimeout(resolve, 1000 * tries));
+      try {
+        return await makeRequest();
+      } catch (err) {
+        console.error(`Retry #${tries} failed:`, err.message || err);
+      }
+    }
+
+    throw new Error("All retries failed after 5 attempts");
+  }
 }

@@ -22,8 +22,10 @@ class BetUsersManager {
   }
 
   set(id, user) {
+    if (!user instanceof BetUser) console.log(user)
+
     assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
-    assert(user && user instanceof BetUser, `${user} must be an instance of BetUser`);
+    assert(user, `${user} must be an instance of BetUser`);
 
     return this.#setUser(user);
   }

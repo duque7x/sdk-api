@@ -20,16 +20,18 @@ exports.Mediator = class {
     }
     async delete() {
         const route = Routes.guilds.mediators.delete(this.id, this.guildId);
-        return await this.#rest.request("DELETE", route);
+        const updatedData = await this.#rest.request("DELETE", route);
+        this.#updateInternals(updatedData);
+        return;
     };
     async setLinks(link) {
         assert(link && typeof link === "string", "Link must be a string");
 
         const route = Routes.guilds.mediators.resource(this.guildId, this.id, "links");
         const payload = { paymentLinks: [link] };
-        const updatedField = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        this.paymentLinks = updatedField;
+        this.#updateInternals(updatedData);
         return this.paymentLinks;
     };
     async removeLink(link) {
@@ -37,9 +39,15 @@ exports.Mediator = class {
         const route = Routes.guilds.mediators.resource(this.guildId, this.id, "links");
 
         const payload = { paymentLinks: this.paymentLinks.filter(lm => lm !== link) };
-        const updatedField = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        this.paymentLinks = updatedField;
+        this.#updateInternals(updatedData);
         return this.paymentLinks;
     };
+    #updateInternals(data) {
+        for (let key in data) {
+            if (key == "id" || key == "_id" || key == "guildId") continue;
+            if (this[key]) this[key] = data[key];
+        }
+    }
 }

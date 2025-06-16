@@ -19,7 +19,7 @@ class User {
     this.blacklist = data.blacklist;
     this.protections = data.protections;
     this.originalChannels = data.originalChannels;
-    this.createdAt =new Date (data.createdAt);
+    this.createdAt = new Date(data.createdAt);
     this.updatedAt = new Date(data.updatedAt);
     this.#rest = rest;
     this.#data = data;
@@ -52,41 +52,39 @@ class User {
     if (typeof key !== "string") throw new Error("key must be a string");
     this.#verifyField(key);
     const route = Routes.guilds.users.resource(this.id, key.toLowerCase(), this.guildId);
-    const reset = await this.#rest.request("DELETE", route);
-    this[key] = reset;
+    const updatedData = await this.#rest.request("DELETE", route);
+    this.#updateInternals(updatedData);
 
     return this;
   };
   async delete() {
     const route = Routes.guilds.users.delete(this.id, this.guildId);
-    await this.#rest.request("delete", route);
+    const updatedData = await this.#rest.request("delete", route);
     return;
 
   };
   async add(field, amount = 1) {
     this.#verifyField(field);
     const route = Routes.guilds.users.resource(this.id, field, this.guildId);
-    const updatedField = await this.#rest.request("PATCH", route, { [field]: amount });
+    const updatedData = await this.#rest.request("PATCH", route, { [field]: amount });
 
-    this[field] = updatedField;
+    this.#updateInternals(updatedData);
     return this[field];
   };
   async remove(field, amount = 1) {
     this.#verifyField(field);
     const route = Routes.guilds.users.resource(this.id, field, this.guildId);
-    const updatedField = await this.#rest.request("PATCH", route, { [field]: -amount });
+    const updatedData = await this.#rest.request("PATCH", route, { [field]: -amount });
 
-    this[field] = updatedField;
+    this.#updateInternals(updatedData);
     return this;
   };
   async set(key, value) {
     if (typeof key !== "string") throw new Error("key must be a string");
     this.#verifyField(key);
     const route = Routes.guilds.users.resource(this.id, field, this.guildId);
-    const updatedField = await this.#rest.request("PATCH", route, { set: value });
-
-    this[key] = updatedField;
-
+    const updatedData = await this.#rest.request("PATCH", route, { set: value });
+    this.#updateInternals(updatedData);
     return this;
   };
   #validFields = [
@@ -99,6 +97,12 @@ class User {
   ];
   #verifyField(field) {
     if (!this.#validFields.includes(field)) throw new Error(`Invalid field "${field}" for update`);
+  }
+  #updateInternals(data) {
+    for (let key in data) {
+      if (key == "id" || key == "_id" || key == "guildId") continue;
+      if (this[key]) this[key] = data[key];
+    }
   }
 }
 

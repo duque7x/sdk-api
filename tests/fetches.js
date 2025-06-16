@@ -25,14 +25,14 @@ client.init().then(async (_) => {
   })
   console.log({ userAfter: user });
 
-  const bet = await guild.bets.fetch("68362b93af6146b3f1de7b1a");
+  /* const bet = await guild.bets.fetch("68362b93af6146b3f1de7b1a");
 
   console.log({ statusBefore: bet.status });
   await bet.set("status", STATES.CREATED);
-  console.log({ statusAfter: bet.status });
+  console.log({ statusAfter: bet.status }); */
 
 
-  bet.set("mediatorId")
+ // bet.set("mediatorId")
   const me = guild.betUsers.cache.get("877598927149490186");
 
   await me.update({
@@ -42,7 +42,7 @@ client.init().then(async (_) => {
     losses: 10,
     mvps: 10,
     blacklist: true,
-    type: "add"
+    coins: 10
   });
 
   console.log({ me });

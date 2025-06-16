@@ -35,7 +35,8 @@ exports.BetUser = class {
     const route = Routes.guilds.betUsers.delete(this.id, this.guildId);
     const payload = { id: this.id, name: this.name, guildId: this.guildId };
 
-    await this.#rest.request("DELETE", route, payload);
+    const updatedData = await this.#rest.request("DELETE", route, payload);
+    this.#updateInternals(updatedData);
     return;
   };
   async add(field, amount) {
@@ -44,10 +45,10 @@ exports.BetUser = class {
 
     const route = Routes.guilds.betUsers.resource(this.id, field, this.guildId);
     const payload = { id: this.id, name: this.name, [field]: amount, guildId: this.guildId };
-    const updatedField = await this.#rest.request("PATCH", route, payload);
+    const updatedData = await this.#rest.request("PATCH", route, payload);
 
-    this[field] = updatedField;
-    return this[field];
+    this.#updateInternals(updatedData);
+    return updatedData[field];
   };
   async remove(field, amount) {
     assert(field && typeof field === "string", "Field must be a string");
@@ -55,9 +56,8 @@ exports.BetUser = class {
 
     const route = Routes.guilds.betUsers.resource(this.id, field, this.guildId);
     const payload = { id: this.id, name: this.name, [field]: -amount, guildId: this.guildId };
-    const updatedField = await this.#rest.request("PATCH", route, payload);
-
-    this[field] = updatedField;
+    const updatedData = await this.#rest.request("PATCH", route, payload);
+    this.#updateInternals(updatedData);
     return this;
   };
   async set(key, value) {
@@ -66,9 +66,8 @@ exports.BetUser = class {
 
     const route = Routes.guilds.betUsers.resource(this.id, key.toLowerCase(), this.guildId);
     const payload = { id: this.id, name: this.name, set: value, guildId: this.guildId };
-    const updatedField = await this.#rest.request("PATCH", route, payload);
-
-    this[key] = updatedField;
+    const updatedData = await this.#rest.request("PATCH", route, payload);
+    this.#updateInternals(updatedData);
     return this;
   };
   async update(payload) {
@@ -98,13 +97,9 @@ exports.BetUser = class {
       finalPayload = { ...payload };
     }
     const route = Routes.guilds.betUsers.update(this.id, this.guildId);
-    const response = await this.#rest.request("PATCH", route, finalPayload);
+    const updatedData = await this.#rest.request("PATCH", route, finalPayload);
 
-    for (let key in response) {
-      if (key === "id" || key === "guildId") continue;
-      this[key] = response[key];
-    }
-
+    this.#updateInternals(updatedData);
     return this;
   }
   async reset(key) {
@@ -113,9 +108,15 @@ exports.BetUser = class {
 
     const payload = { [key]: keyMaps[key] };
     const route = Routes.guilds.betUsers.resource(this.id, key, this.guildId);
-    const response = await this.#rest.request("DELETE", route, payload);
+    const updatedData = await this.#rest.request("DELETE", route, payload);
 
-    this[key] = response;
+    this.#updateInternals(updatedData);
     return this;
+  }
+  #updateInternals(data) {
+    for (let key in data) {
+      if (key == "id" || key == "_id" || key == "guildId") continue;
+      if (this[key]) this[key] = data[key];
+    }
   }
 }

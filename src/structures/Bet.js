@@ -13,7 +13,7 @@ class Bet {
         this.players = data?.players ?? [];
         this.price = data?.price ?? 1;
         this.payedBy = data?.payedBy ?? [];
-        this.createdAt = new Date(data.createdAt)?? new Date();
+        this.createdAt = new Date(data.createdAt) ?? new Date();
         this.updatedAt = new Date(data.updatedAt) ?? new Date();
 
         this.channels = data?.channels ?? [];
@@ -29,6 +29,7 @@ class Bet {
         this.embedMessageId = data?.embedMessageId ?? "";
         this.mediatorId = data?.mediatorId ?? "";
         this.confirmed = data?.confirmed ?? [];
+        this.messages = data?.messages ?? [];
         this._id = data?._id;
 
         this.#rest = rest;
@@ -47,17 +48,14 @@ class Bet {
         const route = Routes.guilds.bets.resource(this.guildId, this._id, field.toLowerCase());
         if (field === "channels") {
             const payload = { channel: amount };
-            const updatedField = await this.#rest.request("PATCH", route, payload);
+            const updatedData = await this.#rest.request("PATCH", route, payload);
 
-            this.channels[amount.type] = { id: updatedField.id };
-
-            return updatedField;
+            this.#updateInternals(updatedData);
+            return updatedData["channels"];
         }
-        const updatedField = await this.#rest.request("PATCH", route, { [field]: amount }
-        );
-
-        this.channels[field] = updatedField;
-        return this[field];
+        const updatedData = await this.#rest.request("PATCH", route, { [field]: amount });
+        this.#updateInternals(updatedData);
+        return updatedData[field];
     };
 
     async addConfirmed(type, id) {
@@ -66,22 +64,17 @@ class Bet {
 
         const payload = { entry: { type, id } };
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "confirmed");
-        const response = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        const index = this.confirmed.findIndex(cn => cn.type === type);
-        if (index !== -1) {
-            this.confirmed[index] = { ...response };
-        } else {
-            this.confirmed.push({ ...response });
-        }
+        this.#updateInternals(updatedData);
         return this.confirmed.find(cn => cn.type == type);
     }
-    async addConfrmed(set) {
+    async setConfirmed(set) {
         assert(set && typeof set === "object", "Set must be an object");
 
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "confirmed");
-        const response = await this.#rest.request("PATCH", route, set);
-        this.confirmed = response;
+        const updatedData = await this.#rest.request("PATCH", route, set);
+        this.#updateInternals(updatedData);
         return this.confirmed;
     }
 
@@ -91,40 +84,40 @@ class Bet {
 
         const payload = { set: status };
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "status");
-        const response = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        this.status = response;
-        return this.status;
+        this.#updateInternals(updatedData);
+        return updatedData.status;
     }
     async setWinner(userId) {
         assert(userId && typeof userId === "string", "UserId must be a string");
 
         const payload = { set: userId };
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "winner");
-        const response = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        this.winner = response;
-        return this.winner;
+        this.#updateInternals(updatedData);
+        return updatedData.winner;
     }
     async setLoser(userId) {
         assert(userId && typeof userId === "string", "UserId must be a string");
 
         const payload = { set: userId };
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "loser");
-        const response = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        this.loser = response;
-        return this.loser;
+        this.#updateInternals(updatedData);
+        return updatedData.loser;
     }
     async remove(field, amount) {
         const route = Routes.guilds.bets.resource(this.guildId, this._id, field.toLowerCase());
-        const updatedField = await this.#rest.request(
+        const updatedData = await this.#rest.request(
             "PATCH",
             route,
             { [field]: -amount }
         );
 
-        this[field] = updatedField;
+        this.#updateInternals(updatedData);
         return this;
     };
     async addChannel(payload) {
@@ -133,19 +126,30 @@ class Bet {
         assert(payload.type, "Channel.type must be present");
 
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "channels");
-        const response = await this.#rest.request("PATCH", route, payload);
-        this.channels = response;
-        return response;
+        const updatedData = await this.#rest.request("PATCH", route, payload);
+        this.#updateInternals(updatedData);
+        return updatedData.channels.find(cn => cn.type == payload.type);
+    }
+    async addMessage(payload) {
+        assert(payload && typeof payload === "object", "Key must be an object");
+        assert(payload.id, "Message.id must be present");
+        assert(payload.type, "Message.type must be present");
+
+        const route = Routes.guilds.bets.resource(this.guildId, this._id, "messages");
+        const updatedData = await this.#rest.request("PATCH", route, payload);
+        this.#updateInternals(updatedData);
+
+        return updatedData.messages.find(msg => msg.type == payload.type);
     }
     async setChannels(channels) {
         assert(payload && typeof payload === "object", "Key must be an object");
 
         const payload = { set: channels };
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "channels");
-        const response = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        this.channels = response;
-        return response;
+        this.#updateInternals(updatedData);
+        return updatedData["channels"];
     }
 
     async set(key, value) {
@@ -160,14 +164,14 @@ class Bet {
             assert(value.type && typeof value.type === "string", "Payload must include a type");
 
             const payload = { entry: { type: value.type, id: value.id } };
-            const updatedField = await this.#rest.request("POST", route, payload);
-            this.confirmed = updatedField;
+            const updatedData = await this.#rest.request("POST", route, payload);
+            this.#updateInternals(updatedData);
 
-            return this.confirmed;
+            return updatedData.confirmed.find(cn => cn.type == value.type);
         }
         const payload = { set: value };
-        const updatedField = await this.#rest.request("PATCH", route, payload);
-        this[key] = updatedField;
+        const updatedData = await this.#rest.request("PATCH", route, payload);
+        this.#updateInternals(updatedData);
         return this;
     };
     async addPlayer(payload) {
@@ -177,10 +181,10 @@ class Bet {
         payload.guildId = this.guildId;
 
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "players");
-        const response = await this.#rest.request("POST", route, payload);
+        const updatedData = await this.#rest.request("POST", route, payload);
 
-        this.players = response;
-        return response;
+        this.#updateInternals(updatedData);
+        return updatedData.players;
     }
     async removePlayer(payload) {
         assert(payload && typeof payload === "object", "Payload must be an object");
@@ -190,10 +194,15 @@ class Bet {
         payload.betId = this._id;
 
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "players", payload.id);
-        const response = await this.#rest.request("DELETE", route, payload);
-
-        this.players = response;
-        return response;
+        const updatedData = await this.#rest.request("DELETE", route, payload);
+        this.#updateInternals(updatedData);
+        return updatedData.players;
+    }
+    #updateInternals(data) {
+        for (let key in data) {
+            if (key == "id" || key == "_id" || key == "guildId") continue;
+            if (this[key]) this[key] = data[key];
+        }
     }
 }
 module.exports = { Bet };
