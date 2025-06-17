@@ -2,7 +2,7 @@ import { BETTYPES } from "../payloads/BetCreatePayload";
 import { REST } from "../rest/REST";
 import { BaseMatch } from "./BaseMatch";
 import { STATES } from "./Guild";
-import {Player} from "../../../index";
+import { Player } from "../../../index";
 
 export interface Confirmed {
     ids: string[];
@@ -56,7 +56,8 @@ export declare class Bet extends BaseMatch {
     creatorId: string;
     adminId: string;
     _id: string;
-
+    mode: string;
+    
     constructor(data: BetData, rest: REST, guildId: string);
 
     get data(): BetData;

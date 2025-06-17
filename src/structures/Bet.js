@@ -21,6 +21,8 @@ class Bet {
         this.loser = data?.loser ?? "";
 
         this.type = data?.type ?? "4v4";
+        this.mode = data?.mode ?? "misto";
+        
         this.status = data?.status ?? "created";
         this.maximumSize = data?.maximumSize ?? 2;
         this.teamA = data?.teamA ?? [];
