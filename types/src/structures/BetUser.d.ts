@@ -37,6 +37,10 @@ type BetUserData = {
   updatedAt?: Date;
   coins?: number;
   dailyWins?: DailyWins;
+  profileCard?: {
+    description: string;
+    bannerId?: string;
+  }
 }
 
 type DailyWins = {
@@ -48,18 +52,23 @@ export class BetUser extends BaseUser {
   betsPlayed?: string[];
   coins: number;
   dailyWins: DailyWins;
-
+  profileCard: {
+    description: string;
+    bannerId: string;
+  }
   constructor(data: BetUserData, rest: REST, guildId: string);
 
   get data(): BetUserData;
 
-  delete(): Promise<BetUserData>;
+  delete(): Promise<BetUser>;
 
-  add<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUserData>;
+  add<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUser>;
 
-  remove<F extends keyof BetUserData, A = BetUserData[F]>(field: F | string, amount: A): Promise<BetUserData>;
+  remove<F extends keyof BetUserData, A = BetUserData[F]>(field: F | string, amount: A): Promise<BetUser>;
 
-  set<F extends keyof BetUserData, A = BetUserData[F]>(key: F | string, value: A): Promise<BetUserData>;
+  set<F extends keyof BetUserData, A = BetUserData[F]>(key: F | string, value: A): Promise<BetUser>;
+
+  setDescription(description: string): Promise<BetUser>;
 
   update(payload: BetUserData): Promise<BetUser>;
 

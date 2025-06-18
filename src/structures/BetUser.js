@@ -22,6 +22,7 @@ exports.BetUser = class {
 
     this.coins = data?.coins ? Number(data?.coins) : 0;
     this.dailyWins = data?.dailyWins ?? { amount: 0, date: new Date() };
+    this.profileCard = data?.profileCard ? data.profileCard : { description: "Use o botão abaixo para alterar a sua bio.", bannerId: 1 };
 
     this.#rest = rest;
     this.#data = data;
@@ -39,6 +40,26 @@ exports.BetUser = class {
     this.#updateInternals(updatedData);
     return;
   };
+  async setDescription(description) {
+    assert(description && typeof description === "string", "Description must be a string");
+
+    const route = Routes.guilds.betUsers.resource(this.id, "description", this.guildId);
+    const payload = { description };
+    const updatedData = await this.#rest.request("PATCH", route, payload);
+
+    this.#updateInternals(updatedData);
+    return this;
+  }
+  async setBanner(banner) {
+    assert(banner && typeof banner === "string", "Banner must be a string");
+
+    const route = Routes.guilds.betUsers.resource(this.id, "banner", this.guildId);
+    const payload = { description };
+    const updatedData = await this.#rest.request("PATCH", route, payload);
+
+    this.#updateInternals(updatedData);
+    return this;
+  }
   async add(field, amount) {
     assert(field && typeof field === "string", "Field must be a string");
     assert(amount, "Amount must be present");
@@ -48,7 +69,7 @@ exports.BetUser = class {
     const updatedData = await this.#rest.request("PATCH", route, payload);
 
     this.#updateInternals(updatedData);
-    return updatedData[field];
+    return this;
   };
   async remove(field, amount) {
     assert(field && typeof field === "string", "Field must be a string");

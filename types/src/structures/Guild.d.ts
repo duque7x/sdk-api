@@ -7,6 +7,14 @@ import { MATCHTYPES } from "../../../index";
 import { BETTYPES } from "../payloads/BetCreatePayload";
 import { MediatorsManager } from "../managers/MediatorsManager";
 
+interface Channel {
+    id: string;
+    type: string;
+}
+
+interface Role {
+    id: string;
+}
 interface GuildData {
     prefix: string;
     id: string;
@@ -19,22 +27,26 @@ interface GuildData {
     seasonId: string;
     betsChannelId: string;
     mediators: MediatorsManager;
-}
 
+
+}
+interface BlackListed {
+    id: string;
+    addedBy: string;
+    when: Date
+}
 export class Guild {
+    blacklist: BlackListed[];
+
     prefix: string;
     id: string;
     seasonId: string;
-    betsChannels: {
-        "1v1": string,
-        "2v2": string,
-        "3v3": string,
-        "4v4": string,
-    } | Record<string, string>;
 
-    channels: {
-        "dailyRank": string;
-    } | Record<string, string>;
+    channels: Channel[];
+
+    categories: Channel[];
+
+    roles: Role[];
 
     name: string;
     _id: string;
@@ -66,6 +78,12 @@ export class Guild {
         key: F,
         value: A
     ): Promise<A>;
+
+    setStatus<K extends keyof GUILDSTATUS, V = "on" | "off">(key: K, value: V): Promise<Guild>;
+
+    addRole(type: string, id: string): Promise<Guild>;
+    addCategory(type: string, id: string): Promise<Guild>;
+    addChannel(type: string, id: string): Promise<Guild>;
 }
 export declare enum STATES {
     "ON" = "on",
@@ -78,35 +96,39 @@ export declare enum BASESTATUS {
     "ON" = "on",
     "OFF" = "on",
 }
-
+interface Mediator {
+    name?: string;
+    id: string, joinedAt?: Date;
+    paymentLinks?: string[]
+}
 type KeysAvailable = {
-    blacklist: string[];
+    blacklist: BlackListed;
     prefix: string;
     pricesOn: number;
     pricesAvailable: number;
     status: GUILDSTATUS;
     seasonId: string;
 
-    betsChannels: {
-        type: MATCHTYPES | BETTYPES | string,
-        id: string
-    };
+    mediators: Mediator[];
+
+
     channels: {
-        type: "dailyRank" | string,
-        id: string
-    } | Record<string, string>;
+        dailyRank: Channel;
+        blacklist: Channel
+    };
 
-    mediators: { name?: string, id: string, joinedAt?: Date, paymentLinks?: string[] };
+    categories: {
+        bets: Channel;
+        betsChannel: Channel;
+    };
 
-    createdAt: Date;
-    updatedAt: Date;
-
-    dailyRankStatus: string | BASESTATUS;
-    matchesStatus: string | BASESTATUS;
-    betsStatus: string | BASESTATUS;
+    roles: {
+        season: Role,
+    } | Role[];
 };
 type GUILDSTATUS = {
     bets: "on" | "off";
     matches: "on" | "off";
     dailyRank: "on" | "off";
+    createVoiceChannels: "on" | "off"
 }
