@@ -84,6 +84,8 @@ export class Guild {
     addRole(type: string, id: string): Promise<Guild>;
     addCategory(type: string, id: string): Promise<Guild>;
     addChannel(type: string, id: string): Promise<Guild>;
+
+    setBlacklist(value: boolean, id: string, adminId: string): Promise<Guild>;
 }
 export declare enum STATES {
     "ON" = "on",

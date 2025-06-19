@@ -31,7 +31,7 @@ export class BaseUser {
    * Indicates whether the player is blacklisted.
    * @default false
    */
-  blacklisted: boolean;
+  blacklist: boolean;
 
   createdAt: Date;
   updatedAt: Date;

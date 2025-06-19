@@ -40,6 +40,17 @@ exports.BetUser = class {
     this.#updateInternals(updatedData);
     return;
   };
+  async setBlacklist(value) {
+    assert(value !== undefined && typeof value === "boolean", "Value must be a boolean");
+
+
+    const route = Routes.guilds.betUsers.resource(this.id, "blacklist", this.guildId);
+    const payload = { value, name: this.name };
+    const updatedData = await this.#rest.request("PATCH", route, payload);
+
+    this.#updateInternals(updatedData);
+    return this;
+  }
   async setDescription(description) {
     assert(description && typeof description === "string", "Description must be a string");
 
@@ -114,8 +125,23 @@ exports.BetUser = class {
           }
         }
       }
-    } else {
-      finalPayload = { ...payload };
+    } else if (payload.type == "remove") {
+      for (let key in payload) {
+        if (key === "type") continue; // Skip type
+
+        if (key == "losses") finalPayload.losses = Math.max(0, this.losses - payload.losses);
+        if (key == "wins") finalPayload.wins = Math.max(0, this.wins - payload.wins);
+        if (key == "mvps") finalPayload.mvps = Math.max(0, this.mvps - payload.mvps);
+        if (key == "credit") finalPayload.credit = Math.max(0, this.credit - payload.credit);
+        if (key == "coins") finalPayload.coins = Math.max(0, this.coins - payload.coins);
+
+        if (key == "betsPlayed") {
+          finalPayload.betsPlayed = [...this.betsPlayed];
+          for (let bet of payload.betsPlayed) {
+              finalPayload.betsPlayed = finalPayload.betsPlayed.filter(id => id != bet);
+          }
+        }
+      }
     }
     const route = Routes.guilds.betUsers.update(this.id, this.guildId);
     const updatedData = await this.#rest.request("PATCH", route, finalPayload);

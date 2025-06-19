@@ -26,12 +26,12 @@ class Guild {
         this.createdAt = new Date(data.createdAt);
         this.updatedAt = new Date(data.updatedAt);
         this._id = data?._id;
-        this.blacklist = data?.blacklist ?? [];
+        this.blacklist = [];
 
         this.roles = data?.roles ?? {};
         this.channels = data?.channels ?? {};;
         this.categories = data?.categories ?? {};;
-        
+
         this.users = new UsersManager(rest, this.id);
         this.betUsers = new BetUsersManager(rest, this.id);
         this.bets = new BetsManager(rest, this.id);
@@ -40,56 +40,80 @@ class Guild {
 
         this.#rest = rest;
         this.#data = data;
+
+        for (let pl of data?.blacklist ?? []) {
+            this.blacklist.push({ id: pl.id, addedBy: pl.addedBy, when: new Date(pl.when) })
+        }
     }
 
     get data() {
         return this.#data;
     }
+    async setBlacklist(value, userId, adminId) {
+        assert(value !== undefined && typeof value === "boolean", "Value must be a boolean");
+
+        const user = this.betUsers.cache.get(userId);
+
+        const route = Routes.guilds.resource("blacklist", this.id);
+        const payload = {
+            id: userId,
+            name: user.name ?? "dw",
+            adminId,
+            value
+        };
+        const updatedData = await this.#rest.request("PATCH", route, payload);
+
+        await user.setBlacklist(value);
+
+        this.#updateInternals(updatedData);
+        return this;
+    }
+
     async addRole(type, id) {
         assert(typeof id == "string", "Id must be a string");
         assert(typeof type == "string", "Type must be a string");
 
         const route = Routes.guilds.resource("roles", this.id);
         const updatedData = await this.#rest.request("POST", route, { id, type });
-        
+
         this.#updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
-    } 
+    }
     async addCategory(type, id) {
         assert(typeof type == "string", "Type must be a string");
         assert(typeof id == "string", "Id must be a string");
 
         const route = Routes.guilds.resource("categories", this.id);
         const updatedData = await this.#rest.request("POST", route, { type, id });
-        
+
         this.#updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
-    } 
+    }
     async addChannel(type, id) {
         assert(typeof type == "string", "Type must be a string");
         assert(typeof id == "string", "Id must be a string");
 
         const route = Routes.guilds.resource("channels", this.id);
         const updatedData = await this.#rest.request("POST", route, { type, id });
-        
+
         this.#updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
-    } 
+    }
     async setStatus(key, status) {
         assert(typeof key == "string", "Key must be a string");
         assert(typeof status == "string", "Status must be a string");
 
         const route = Routes.fields(Routes.guilds.resource("status", this.id), key);
         const updatedData = await this.#rest.request("PATCH", route, { status });
-        
+
         this.#updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
-   
+
     async add(key, value) {
         assert(typeof key === "string", "Key must be a string");
         assert(value !== undefined, "Value must be provided");

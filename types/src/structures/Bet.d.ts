@@ -3,6 +3,8 @@ import { REST } from "../rest/REST";
 import { BaseMatch } from "./BaseMatch";
 import { STATES } from "./Guild";
 import { Player } from "../../../index";
+import { LogsManager } from "../managers/LogsManager";
+import { Collection } from "../structures/Collection";
 
 export interface Confirmed {
     ids: string[];
@@ -17,6 +19,7 @@ export interface Message {
     id: string;
     type: string;
 }
+
 export interface BetData {
     type: BETTYPES;
     price: number;
@@ -57,6 +60,7 @@ export declare class Bet extends BaseMatch {
     adminId: string;
     _id: string;
     mode: string;
+    logs: LogsManager;
     
     constructor(data: BetData, rest: REST, guildId: string);
 

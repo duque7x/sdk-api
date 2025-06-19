@@ -15,7 +15,7 @@ exports.GuildsManager = class GuildsManager {
     get cache() {
         return this.#guilds;
     }
-
+  
     set(id, guild) {
         assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
         assert(guild instanceof Guild, `${guild} must be an instance of Guild`);
@@ -89,16 +89,16 @@ exports.GuildsManager = class GuildsManager {
 
     async cacheGuilds() {
         const FIVE_MINUTES = 5 * 60 * 1000;
-    
+
         const requestGuilds = async () => {
             const route = Routes.guilds.getAll();
             const guilds = await this.#rest.request("GET", route);
             if (!guilds || guilds.error) return new Collection();
-    
+
             this.#guilds.clear();
             for (const guildData of guilds) {
                 if (!guildData.id) continue;
-    
+
                 const guild = new Guild(guildData, this.#rest);
                 guild.setstuff(
                     guildData.users,
@@ -110,9 +110,9 @@ exports.GuildsManager = class GuildsManager {
                 this.set(guild.id, guild);
             }
         };
-    
+
         setInterval(() => requestGuilds().catch(console.error), FIVE_MINUTES);
-    
+
         await requestGuilds().catch(console.error);
         return this.#guilds;
     }

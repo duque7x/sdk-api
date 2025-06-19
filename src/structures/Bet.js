@@ -1,3 +1,4 @@
+const { LogsManager } = require("../managers/logs/LogsManager");
 const Routes = require("../rest/Routes");
 const assert = require("node:assert");
 
@@ -23,6 +24,15 @@ class Bet {
         this.type = data?.type ?? "4v4";
         this.mode = data?.mode ?? "misto";
         
+        this.logs = new LogsManager({
+            messages: data?.logs.messages,
+            guildId,
+            _id: data?._id
+        }, rest);
+
+        this.createdAt = new Date(data?.createdAt) ?? new Date();
+        this.updatedAt = new Date(data?.updatedAt) ?? new Date();
+
         this.status = data?.status ?? "created";
         this.maximumSize = data?.maximumSize ?? 2;
         this.teamA = data?.teamA ?? [];

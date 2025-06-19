@@ -75,4 +75,6 @@ export class BetUser extends BaseUser {
   reset(key: keyof BetUserData): Promise<BetUser>;
 
   reset(): Promise<BetUser>;
+
+  setBlacklist(value: boolean): Promise<BetUser>;
 }
