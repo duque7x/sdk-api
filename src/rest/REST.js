@@ -36,7 +36,8 @@ async function doShit(method, url, dataToSend) {
     const headers = new Headers();
     headers.append("duque-auth", process.env.AUTH);
     headers.append("Content-Type", "application/json");
-
+    console.log(`Requesting ${url}`);
+    
     const res = await request(url, {
       method,
       headers,

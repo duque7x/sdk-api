@@ -143,6 +143,7 @@ exports.BetUser = class {
         }
       }
     }
+    
     const route = Routes.guilds.betUsers.update(this.id, this.guildId);
     const updatedData = await this.#rest.request("PATCH", route, finalPayload);
 
