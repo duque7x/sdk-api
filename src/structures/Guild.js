@@ -29,6 +29,9 @@ class Guild {
         this.blacklist = [];
 
         this.roles = data?.roles ?? {};
+        this.messages = data?.messages ?? {};
+        this.emojis = data?.emojis ?? {};
+        
         this.channels = data?.channels ?? {};;
         this.categories = data?.categories ?? {};;
 
