@@ -3,8 +3,6 @@ import { UserManager } from "../managers/UserManager";
 import { BetsManager } from "../managers/BetsManager";
 import { BetUsersManager } from "../managers/BetUsersManager";
 import { REST } from "../rest/REST";
-import { MATCHTYPES } from "../../../index";
-import { BETTYPES } from "../payloads/BetCreatePayload";
 import { MediatorsManager } from "../managers/MediatorsManager";
 
 interface Channel {
@@ -12,8 +10,19 @@ interface Channel {
     type: string;
 }
 
+interface Message {
+    id: string;
+    type: string;
+}
+interface Emoji {
+    id: string;
+    type: string;
+    animated: boolean;
+}
+
 interface Role {
     id: string;
+    type: string;
 }
 interface GuildData {
     prefix: string;
@@ -27,8 +36,6 @@ interface GuildData {
     seasonId: string;
     betsChannelId: string;
     mediators: MediatorsManager;
-
-
 }
 interface BlackListed {
     id: string;
@@ -47,6 +54,8 @@ export class Guild {
     categories: Channel[];
 
     roles: Role[];
+    messages: Message[];
+    emojis: Emoji[];
 
     name: string;
     _id: string;
@@ -86,6 +95,12 @@ export class Guild {
     addChannel(type: string, id: string): Promise<Guild>;
 
     setBlacklist(value: boolean, id: string, adminId: string): Promise<Guild>;
+
+    addMessage(type: string, id: string): Promise<Guild>;
+    deleteMessage(type: string, id: string): Promise<Guild>;
+
+    addEmoji(type: string, id: string, animated?: boolean): Promise<Guild>;
+    deleteEmoji(type: string, id: string): Promise<Guild>;
 }
 export declare enum STATES {
     "ON" = "on",
@@ -124,9 +139,7 @@ type KeysAvailable = {
         betsChannel: Channel;
     };
 
-    roles: {
-        season: Role,
-    } | Role[];
+    roles: Role[];
 };
 type GUILDSTATUS = {
     bets: "on" | "off";

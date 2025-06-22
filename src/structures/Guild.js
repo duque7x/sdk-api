@@ -69,6 +69,50 @@ class Guild {
         return this;
     }
 
+    async addMessage(type, id) {
+        assert(typeof id == "string", "Id must be a string");
+        assert(typeof type == "string", "Type must be a string");
+
+        const route = Routes.guilds.resource("messages", this.id);
+        const updatedData = await this.#rest.request("POST", route, { id, type });
+
+        this.#updateInternals(updatedData);
+        this.#rest.emit("guildUpdate", this);
+        return this;
+    }
+    async deleteMessage(type, id) {
+        assert(typeof id == "string", "Id must be a string");
+        assert(typeof type == "string", "Type must be a string");
+
+        const route = Routes.guilds.resource("messages", this.id);
+        const updatedData = await this.#rest.request("DELETE", route, { id, type });
+
+        this.#updateInternals(updatedData);
+        this.#rest.emit("guildUpdate", this);
+        return this;
+    }
+    async addEmoji(type, id, animated) {
+        assert(typeof id == "string", "Id must be a string");
+        assert(typeof type == "string", "Type must be a string");
+
+        const route = Routes.guilds.resource("emojis", this.id);
+        const updatedData = await this.#rest.request("POST", route, { id, type, animated });
+
+        this.#updateInternals(updatedData);
+        this.#rest.emit("guildUpdate", this);
+        return this;
+    }
+    async deleteEmoji(type, id) {
+        assert(typeof id == "string", "Id must be a string");
+        assert(typeof type == "string", "Type must be a string");
+
+        const route = Routes.guilds.resource("emojis", this.id);
+        const updatedData = await this.#rest.request("DELETE", route, { id, type });
+
+        this.#updateInternals(updatedData);
+        this.#rest.emit("guildUpdate", this);
+        return this;
+    }
     async addRole(type, id) {
         assert(typeof id == "string", "Id must be a string");
         assert(typeof type == "string", "Type must be a string");
@@ -181,7 +225,7 @@ class Guild {
     }
 
     async updateInternals() {
-        const FIVE_MINUTES = 5 * 60 * 1000;
+        const ONE_MINUTE = 1 * 60 * 1000;
         this.#autoClean();
         const baseRoute = Routes.guilds.get(this.id);
 
@@ -199,8 +243,7 @@ class Guild {
                 console.error(`Erro ao atualizar dados da guilda ${this.id}:`, err);
             }
         };
-        await update();
-        setInterval(update, FIVE_MINUTES);
+        setInterval(update, ONE_MINUTE);
     }
 
     setstuff(users, betUsers, bets, matches, mediators) {

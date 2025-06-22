@@ -15,7 +15,7 @@ exports.GuildsManager = class GuildsManager {
     get cache() {
         return this.#guilds;
     }
-  
+
     set(id, guild) {
         assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
         assert(guild instanceof Guild, `${guild} must be an instance of Guild`);
@@ -88,7 +88,7 @@ exports.GuildsManager = class GuildsManager {
     }
 
     async cacheGuilds() {
-        const FIVE_MINUTES = 5 * 60 * 1000;
+        const ONE_MINUTE = 1 * 60 * 1000;
 
         const requestGuilds = async () => {
             const route = Routes.guilds.getAll();
@@ -100,19 +100,12 @@ exports.GuildsManager = class GuildsManager {
                 if (!guildData.id) continue;
 
                 const guild = new Guild(guildData, this.#rest);
-                guild.setstuff(
-                    guildData.users,
-                    guildData.betUsers,
-                    guildData.bets,
-                    guildData.matches,
-                    guildData.mediators
-                );
+                guild.setstuff(guildData.users, guildData.betUsers, guildData.bets, guildData.matches, guildData.mediators);
                 this.set(guild.id, guild);
             }
         };
 
-        setInterval(() => requestGuilds().catch(console.error), FIVE_MINUTES);
-
+        setInterval(() => requestGuilds().catch(console.error), ONE_MINUTE);
         await requestGuilds().catch(console.error);
         return this.#guilds;
     }

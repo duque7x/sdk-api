@@ -38,8 +38,11 @@ type BetUserData = {
   coins?: number;
   dailyWins?: DailyWins;
   profileCard?: {
-    description: string;
-    bannerId?: string;
+    description?: string;
+    banner?: {
+      equipped: number;
+      allowed: number[];
+    };
   }
 }
 
@@ -54,7 +57,10 @@ export class BetUser extends BaseUser {
   dailyWins: DailyWins;
   profileCard: {
     description: string;
-    bannerId: string;
+    banner: {
+      equipped: number;
+      allowed: number[];
+    };
   }
   constructor(data: BetUserData, rest: REST, guildId: string);
 
@@ -77,4 +83,6 @@ export class BetUser extends BaseUser {
   reset(): Promise<BetUser>;
 
   setBlacklist(value: boolean): Promise<BetUser>;
+
+  setBanner(id: number): Promise<BetUser>;
 }

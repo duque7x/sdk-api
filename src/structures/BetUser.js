@@ -22,7 +22,7 @@ exports.BetUser = class {
 
     this.coins = data?.coins ? Number(data?.coins) : 0;
     this.dailyWins = data?.dailyWins ?? { amount: 0, date: new Date() };
-    this.profileCard = data?.profileCard ? data.profileCard : { description: "Use o botão abaixo para alterar a sua bio.", bannerId: 1 };
+    this.profileCard = data?.profileCard ? data.profileCard : { description: "Use o botão abaixo para alterar a sua bio.", banner: { equipped: 1, allowed: [1] } };
 
     this.#rest = rest;
     this.#data = data;
@@ -43,7 +43,6 @@ exports.BetUser = class {
   async setBlacklist(value) {
     assert(value !== undefined && typeof value === "boolean", "Value must be a boolean");
 
-
     const route = Routes.guilds.betUsers.resource(this.id, "blacklist", this.guildId);
     const payload = { value, name: this.name };
     const updatedData = await this.#rest.request("PATCH", route, payload);
@@ -62,10 +61,10 @@ exports.BetUser = class {
     return this;
   }
   async setBanner(banner) {
-    assert(banner && typeof banner === "string", "Banner must be a string");
+    assert(typeof banner === "number", "BannerId must be a number");
 
     const route = Routes.guilds.betUsers.resource(this.id, "banner", this.guildId);
-    const payload = { description };
+    const payload = { bannerId: banner };
     const updatedData = await this.#rest.request("PATCH", route, payload);
 
     this.#updateInternals(updatedData);
@@ -164,7 +163,7 @@ exports.BetUser = class {
   #updateInternals(data) {
     for (let key in data) {
       if (key == "id" || key == "_id" || key == "guildId") continue;
-      if (this[key]) this[key] = data[key];
+      if (this[key] !== undefined) this[key] = data[key];
     }
   }
 }
