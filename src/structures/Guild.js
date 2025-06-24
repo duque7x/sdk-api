@@ -68,7 +68,7 @@ class Guild {
 
         await user.setBlacklist(value);
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         return this;
     }
 
@@ -79,18 +79,18 @@ class Guild {
         const route = Routes.guilds.resource("messages", this.id);
         const updatedData = await this.#rest.request("POST", route, { id, type });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
-    async deleteMessage(type, id) {
+    async removeMessage(type, id) {
         assert(typeof id == "string", "Id must be a string");
         assert(typeof type == "string", "Type must be a string");
 
-        const route = Routes.guilds.resource("messages", this.id);
+        const route = Routes.fields(Routes.guilds.resource("messages", this.id), type, id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -101,18 +101,18 @@ class Guild {
         const route = Routes.guilds.resource("emojis", this.id);
         const updatedData = await this.#rest.request("POST", route, { id, type, animated });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
-    async deleteEmoji(type, id) {
+    async removeEmoji(type, id) {
         assert(typeof id == "string", "Id must be a string");
         assert(typeof type == "string", "Type must be a string");
 
         const route = Routes.guilds.resource("emojis", this.id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -123,7 +123,18 @@ class Guild {
         const route = Routes.guilds.resource("roles", this.id);
         const updatedData = await this.#rest.request("POST", route, { id, type });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
+        this.#rest.emit("guildUpdate", this);
+        return this;
+    }
+    async removeRole(type, id) {
+        assert(typeof id == "string", "Id must be a string");
+        assert(typeof type == "string", "Type must be a string");
+
+        const route = Routes.fields(Routes.guilds.resource("roles", this.id), type, id);
+        const updatedData = await this.#rest.request("DELETE", route, { id, type });
+
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -134,7 +145,18 @@ class Guild {
         const route = Routes.guilds.resource("categories", this.id);
         const updatedData = await this.#rest.request("POST", route, { type, id });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
+        this.#rest.emit("guildUpdate", this);
+        return this;
+    }
+    async removeCategory(type, id) {
+        assert(typeof id == "string", "Id must be a string");
+        assert(typeof type == "string", "Type must be a string");
+
+        const route = Routes.fields(Routes.guilds.resource("category", this.id), type, id);
+        const updatedData = await this.#rest.request("DELETE", route, { id, type });
+
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -145,10 +167,22 @@ class Guild {
         const route = Routes.guilds.resource("channels", this.id);
         const updatedData = await this.#rest.request("POST", route, { type, id });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
+    async removeChannel(type, id) {
+        assert(typeof id == "string", "Id must be a string");
+        assert(typeof type == "string", "Type must be a string");
+
+        const route = Routes.fields(Routes.guilds.resource("channels", this.id), type, id);
+        const updatedData = await this.#rest.request("DELETE", route, { id, type });
+
+        this.updateInternals(updatedData);
+        this.#rest.emit("guildUpdate", this);
+        return this;
+    }
+
     async setStatus(key, status) {
         assert(typeof key == "string", "Key must be a string");
         assert(typeof status == "string", "Status must be a string");
@@ -156,7 +190,7 @@ class Guild {
         const route = Routes.fields(Routes.guilds.resource("status", this.id), key);
         const updatedData = await this.#rest.request("PATCH", route, { status });
 
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -172,7 +206,7 @@ class Guild {
             assert(value.type && value.id, "Both type and id must be present");
 
             const updatedData = await this.#rest.request("PATCH", route, value);
-            this.#updateInternals(updatedData);
+            this.updateInternals(updatedData);
             this.#rest.emit("guildUpdate", updatedData);
             return updatedData;
         }
@@ -183,13 +217,13 @@ class Guild {
 
             const payload = { status: value.value };
             const updatedData = await this.#rest.request("PATCH", Routes.fields(route, value.type), payload);
-            this.#updateInternals(updatedData);
+            this.updateInternals(updatedData);
             this.#rest.emit("guildUpdate", updatedData);
             return updatedData;
         }
 
         const updatedData = await this.#rest.request("PATCH", route, { [key]: value });
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         this.#rest.emit("guildUpdate", updatedData);
         return updatedData;
     }
@@ -197,7 +231,7 @@ class Guild {
     async remove(key, value) {
         const route = Routes.guilds.resource(key, this.id);
         const updatedData = await this.#rest.request("DELETE", route, { [key]: value });
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         return value;
     }
 
@@ -211,14 +245,14 @@ class Guild {
 
             const route = Routes.fields(Routes.guilds.resource("status", this.id), statusMap[key]);
             const updatedData = await this.#rest.request("PATCH", route, { status: value });
-            this.#updateInternals(updatedData);
+            this.updateInternals(updatedData);
             this.#rest.emit("guildUpdate", this);
             return this.status;
         }
 
         const route = Routes.guilds.resource(key, this.id);
         const updatedData = await this.#rest.request("PATCH", route, { set: value });
-        this.#updateInternals(updatedData);
+        this.updateInternals(updatedData);
         return this.status;
     }
 
@@ -227,7 +261,7 @@ class Guild {
         this.pricesAvailable = [...new Set(this.pricesAvailable)].sort((a, b) => a - b);
     }
 
-    async updateInternals() {
+    async updateInternalsFetchly() {
         const ONE_MINUTE = 1 * 60 * 1000;
         this.#autoClean();
         const baseRoute = Routes.guilds.get(this.id);
@@ -285,7 +319,7 @@ class Guild {
         }
     }
 
-    #updateInternals(data) {
+    updateInternals(data) {
         for (const key in data) {
             if (["id", "_id", "guildId"].includes(key)) continue;
 
