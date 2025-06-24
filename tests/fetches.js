@@ -14,38 +14,6 @@ client.init().then(async (_) => {
   await guild.matches.fetchAll();
   await guild.bets.fetchAll();
 
-
-  const user = guild.betUsers.cache.at(0);
-  console.log({ userBefore: user });
-  await user.update({
-    wins: 100,
-    betsPlayed: [203203],
-    credit: 10 * 1.10,
-    //type: "add"
-  })
-  console.log({ userAfter: user });
-
-  /* const bet = await guild.bets.fetch("68362b93af6146b3f1de7b1a");
-
-  console.log({ statusBefore: bet.status });
-  await bet.set("status", STATES.CREATED);
-  console.log({ statusAfter: bet.status }); */
-
-
- // bet.set("mediatorId")
-  const me = guild.betUsers.cache.get("877598927149490186");
-
-  await me.update({
-    wins: 10,
-    credit: 10,
-    betsPlayed: ["68362b93af6146b3f1de7b1a", "68362b93af6146b3f1de7b1a", "1355544935662883100"],
-    losses: 10,
-    mvps: 10,
-    blacklist: true,
-    coins: 10
-  });
-
-  console.log({ me });
   const now = Date.now();
   console.log(`It took`, chalk.bgRed(`${now - before}ms`), "to fetch all data.");
 });
