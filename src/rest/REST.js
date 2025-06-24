@@ -32,11 +32,12 @@ exports.REST = class extends EventEmitter {
 }
 
 async function doShit(method, url, dataToSend) {
+  method = method.toUpperCase();
+  
   const makeRequest = async () => {
     const headers = new Headers();
     headers.append("duque-auth", process.env.AUTH);
     headers.append("Content-Type", "application/json");
-    console.log(`Requesting ${url}`);
     
     const res = await request(url, {
       method,
