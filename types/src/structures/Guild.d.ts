@@ -6,12 +6,12 @@ import { REST } from "../rest/REST";
 import { MediatorsManager } from "../managers/MediatorsManager";
 
 interface Channel {
-    id: string;
+    ids: string[];
     type: string;
 }
 
 interface Message {
-    id: string;
+    ids: string[];
     type: string;
 }
 interface Emoji {
@@ -21,7 +21,7 @@ interface Emoji {
 }
 
 interface Role {
-    id: string;
+    ids: string[];
     type: string;
 }
 interface GuildData {
@@ -91,16 +91,21 @@ export class Guild {
     setStatus<K extends keyof GUILDSTATUS, V = "on" | "off">(key: K, value: V): Promise<Guild>;
 
     addRole(type: string, id: string): Promise<Guild>;
+    removeRole(type: string, id: string): Promise<Guild>;
+
     addCategory(type: string, id: string): Promise<Guild>;
+    removeCategory(type: string, id: string): Promise<Guild>;
+
     addChannel(type: string, id: string): Promise<Guild>;
+    removeChannel(type: string, id: string): Promise<Guild>;
 
     setBlacklist(value: boolean, id: string, adminId: string): Promise<Guild>;
 
     addMessage(type: string, id: string): Promise<Guild>;
-    deleteMessage(type: string, id: string): Promise<Guild>;
+    removeMessage(type: string, id: string): Promise<Guild>;
 
     addEmoji(type: string, id: string, animated?: boolean): Promise<Guild>;
-    deleteEmoji(type: string, id: string): Promise<Guild>;
+    removeEmoji(type: string, id: string): Promise<Guild>;
 }
 export declare enum STATES {
     "ON" = "on",
