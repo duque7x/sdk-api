@@ -25,4 +25,9 @@ export class BetUsersManager {
   cacheUsers(): Promise<Collection<string, BetUser>>;
 
   update(id: string, payload: BetUserData): Promise<BetUser | undefined>;
+
+
+  reset(id: string, name: string): Promise<BetUser>;
+
+  resetAll(): Promise<void>;
 }

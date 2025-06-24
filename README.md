@@ -22,6 +22,11 @@ client.init().then(async () => {
   // In my API, using fetch will automatically create an user if he doesn't exist
   const user = guild.users.fetch("877598927149490186");
   console.log({ user });
+
+  // Reseting users
+  client.users.resetAll();
+  // Or
+  client.betUsers.resetAll(0);
 });
 ```
 

@@ -14,6 +14,7 @@ class BetUsersManager {
   constructor(rest, guildId) {
     this.#rest = rest;
     this.#betUsers = new Collection();
+
     this.guildId = guildId;
   }
 
@@ -22,25 +23,42 @@ class BetUsersManager {
   }
 
   set(id, user) {
-    if (!user instanceof BetUser) console.log(user)
-
-    assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
+    assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
     assert(user, `${user} must be an instance of BetUser`);
 
-    return this.#setUser(user);
+    return this.#setUserAndUpdateGuild(user);
   }
+  async reset(id, name) {
+    assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
+    assert(name && typeof name === "string", `${name} must be a string`);
 
+    const route = Routes.guilds.betUsers.delete(id, this.guildId);
+    const payload = { id, name, reset: true };
+    const response = await this.#rest.request("DELETE", route, payload);
+
+    const user = new BetUser(response.betUsers.find(u => u.id == id), this.#rest, this.guildId);
+
+    this.#setUserAndUpdateGuild(response);
+    return user;
+  }
+  async resetAll() {
+    const route = Routes.guilds.resource("betusers", this.guildId);
+    const response = await this.#rest.request("PUT", route);
+
+    this.#setUserAndUpdateGuild(response);
+    return void 0;
+  }
   async fetch(id, name) {
-    assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
+    assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
     assert(name && typeof name === "string", `${name} must be a string and must be included`);
 
     const route = Routes.guilds.betUsers.get(id, this.guildId);
-    const payload = { id, name, guildId: this.guildId };
+    const payload = { id, name };
     const response = await this.#rest.request("GET", route, payload);
 
     const user = new BetUser(response, this.#rest, this.guildId);
 
-    this.#setUser(user);
+    this.#setUserAndUpdateGuild(user);
     return user;
   }
 
@@ -52,7 +70,7 @@ class BetUsersManager {
     this.#betUsers.clear();
     for (let userData of response) {
       const user = new BetUser(userData, this.#rest, this.guildId);
-      this.#setUser(user);
+      this.#setUserAndUpdateGuild(user);
     }
     return this.#betUsers;
   }
@@ -66,7 +84,7 @@ class BetUsersManager {
     const response = await this.#rest.request("POST", route, payload);
     const user = new BetUser(response, this.#rest, this.guildId);
 
-    this.#setUser(user);
+    this.#setUserAndUpdateGuild(user);
     this.#rest.emit("betUserCreate", user);
     return user;
   }
@@ -83,7 +101,7 @@ class BetUsersManager {
     const user = new BetUser(response, this.#rest, this.guildId);
 
     this.#rest.emit("betUserUpdate", userBefore, user);
-    this.#setUser(user);
+    this.#setUserAndUpdateGuild(user);
 
     return user;
   }
@@ -93,6 +111,7 @@ class BetUsersManager {
 
     const route = Routes.guilds.betUsers.delete(id, this.guildId);
     await this.#rest.request("DELETE", route, { guildId: this.guildId });
+
     this.#rest.emit("betUserDelete", this.#betUsers.get(id));
     this.#removeIdFromCache(id);
     return this.#betUsers;
@@ -108,9 +127,9 @@ class BetUsersManager {
   #removeIdFromCache(id) {
     this.#betUsers.delete(id);
   }
-  #setUser(user) {
-    if (this.#betUsers.get(user.id)) this.#removeIdFromCache(user.id);
-    return this.#betUsers.set(user.id, user);
+  #setUserAndUpdateGuild(data) {
+    if (this.#betUsers.get(data.id)) this.#removeIdFromCache(data.id);
+    return this.#betUsers.set(data.id, data);
   }
 }
 
