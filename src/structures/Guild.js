@@ -153,7 +153,7 @@ class Guild {
         assert(typeof id == "string", "Id must be a string");
         assert(typeof type == "string", "Type must be a string");
 
-        const route = Routes.fields(Routes.guilds.resource("category", this.id), type, id);
+        const route = Routes.fields(Routes.guilds.resource("categories", this.id), type, id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
         this.updateInternals(updatedData);
