@@ -1,4 +1,4 @@
-import { REST } from "./REST";
+import { REST } from "./../rest/REST";
 import { User } from "../structures/User";
 import { UserCreatePayload } from "../payloads/UserCreatePayload";
 import { Collection } from "../structures/Collection";
@@ -132,5 +132,9 @@ export declare class UserManager {
   /**
   * Returns all users
   */
-  cacheUsers(): Promise<Collection<string, User>>
+  cacheUsers(): Promise<Collection<string, User>>;
+
+  fetchAll(): Promise<Collection<string, User>>;
+
+  //update(payload): Promise<User>;
 }
