@@ -42,14 +42,14 @@ declare interface ChannelInfo {
 /**
  * Interface representing a full match object.
  */
-export declare interface Match {
+export declare class Match {
     /** Unique ID for the match (MongoDB ObjectId as string) */
     _id: string;
 
     guildId: string;
-    
+
     /** All players involved in the match */
-    players: MatchPlayers;
+    players: Player[];
 
     /** Timestamp of when the match was created */
     createdAt: Date;
@@ -64,7 +64,7 @@ export declare interface Match {
     type: MATCHTYPES;
 
     /** Current status of the match */
-    status: STATES;
+    status: MATCHSTATUS;
 
     /** Players who won the match */
     winnerTeam: string;
@@ -95,4 +95,9 @@ export declare interface Match {
 
     /** Players marked as MVP (Most Valuable Player) */
     mvpId: string;
+
+    addPlayer(id: string, name: string): Promise<Match>;
+    removePlayer(id: string): Promise<Match>;
+
+    setStatus(status: MATCHSTATUS): Promise<Match>;
 }

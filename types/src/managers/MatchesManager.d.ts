@@ -1,6 +1,7 @@
-import { REST } from "./REST";
-import { Match } from "./Match";
+import { REST } from "./../rest/REST";
+import { Match } from "./../structures/Match";
 import { MatchCreatePayload } from "../payloads/MatchCreatePayload";
+import { Collection } from "../structures/Collection";
 
 /**
  * Routes handler for match-related API operations.
@@ -30,4 +31,6 @@ export class MatchesManager {
    * @returns A promise resolving to the created match data.
    */
   create(payload: MatchCreatePayload): Promise<Match>;
+
+  get cache(): Collection<string, Match>;
 }

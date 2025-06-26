@@ -50,7 +50,8 @@ exports.MatchesManager = class MatchesManager {
   async create(payload) {
     assert(payload && typeof payload === "object", "Payload must be an object");
     assert(payload.type && typeof payload.type === "string", "Payload type must be an element of BETTYPES");
-    assert(payload.creatorId && typeof payload.creatorId === "string", "Payload  must include creatorId");
+    assert(payload.creator && typeof payload.creator === "object", "Payload creator must include creator");
+    console.log({ payload });
 
     const route = Routes.guilds.matches.getAll(this.guildId);
     const reponse = await this.#rest.request('POST', route, payload);

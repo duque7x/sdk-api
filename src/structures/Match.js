@@ -9,19 +9,20 @@ class Match {
      * @param {*} data 
      */
     constructor(data, rest, guildId) {
-        this.type = data.type;
-        this.voiceChannels = data.voiceChannels;
-        this.status = data.status;
-        this.creatorId = data.creatorId;
-        this.players = data.players;
-        this.kickedOut = data.kickedOut;
-        this.teamA = data.teamA;
-        this.teamB = data.teamB;
-        this.confirmed = data.confirmed;
-        this.leaders = data.leaders;
-        this._id = data._id;
-        this.createdAt = new Date(data.createdAt);
-        this.updatedAt = new Date(data.updatedAt);
+        this.type = data?.type;
+        this.voiceChannels = data?.voiceChannels;
+        this.status = data?.status;
+        this.creatorId = data?.creatorId;
+        this.players = data?.players;
+        this.kickedOut = data?.kickedOut;
+        this.maximumSize = data?.maximumSize;
+        this.teamA = data?.teamA;
+        this.teamB = data?.teamB;
+        this.confirmed = data?.confirmed;
+        this.leaders = data?.leaders;
+        this._id = data?._id;
+        this.createdAt = new Date(data?.createdAt);
+        this.updatedAt = new Date(data?.updatedAt);
         this.#data = data;
         this.#rest = rest;
 
@@ -65,13 +66,30 @@ class Match {
         this.#updateInternals(updatedData);
         return;
     };
-    async addPlayer(id, name) {
-        if (!id) throw new Error("no id was provided")
-        const route = Routes.guilds.matches.resource(this._id, "players", this.guildId);
-        const updatedData = await this.#rest.request("post", route, { id, name });
+    async setStatus(status) {
+        const route = Routes.guilds.matches.resource(this._id, "status", this.guildId);
+        const updatedData = await this.#rest.request("PATCH", route, { status });
 
         this.#updateInternals(updatedData);
-        return;
+        return this;
+    }
+
+    async addPlayer(id, name) {
+        if (!id) throw new Error("no id was provided");
+        const route = Routes.guilds.matches.resource(this._id, "players", this.guildId);
+        const updatedData = await this.#rest.request("POST", route, { id, name });
+
+        this.#updateInternals(updatedData);
+        return this;
+    }
+    async removePlayer(id) {
+        if (!id) throw new Error("no id was provided");
+
+        const route = Routes.fields(Routes.guilds.matches.resource(this._id, "players", this.guildId), id)
+        const updatedData = await this.#rest.request("DELETE", route, { id });
+
+        this.#updateInternals(updatedData);
+        return this;
     }
     #updateInternals(data) {
         for (let key in data) {
