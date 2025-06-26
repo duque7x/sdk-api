@@ -38,6 +38,12 @@ const BASESTATUS = {
   OFF: "off",
 }
 
+const MATCHSTATUS = {
+  ON: "on",
+  OFF: "off",
+  CREATED: "created", // Match was created but not started
+  SHUTTED: "shutted"  // Match was forcefully closed
+}
 const GUILDSTATUS = {
   bets: "on" || "off",
   matches: "on" || "off",
@@ -60,6 +66,7 @@ exports.BetUser = BetUser;
 exports.STATES = STATES;
 exports.BASESTATUS = BASESTATUS;
 exports.MATCHTYPES = MATCHTYPES;
+exports.MATCHSTATUS = MATCHSTATUS;
 exports.BETTYPES = BETTYPES;
 exports.GUILDSTATUS = GUILDSTATUS;
 exports.Collection = Collection;
