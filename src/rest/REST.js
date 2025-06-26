@@ -6,7 +6,9 @@ const { EventEmitter } = require("node:events");
 const { Collection } = require("../structures/Collection");
 
 exports.REST = class extends EventEmitter {
-  constructor() {
+  #clientKey;
+
+  constructor(clientKey) {
     super({ captureRejections: true });
 
     this.guilds = new GuildsManager(this);
@@ -15,6 +17,8 @@ exports.REST = class extends EventEmitter {
     this.betUsers = new Collection();
     this.matches = new Collection();
     this.bets = new Collection();
+
+    this.#clientKey = clientKey;
   }
 
   async init() {
@@ -26,48 +30,48 @@ exports.REST = class extends EventEmitter {
   }
 
   async #requester(method, url, sendData) {
-    const { data } = await doShit(method, url, sendData);
+    const { data } = await this.doShit(method, url, sendData);
     return data;
   };
-}
-
-async function doShit(method, url, dataToSend) {
-  method = method.toUpperCase();
-  
-  const makeRequest = async () => {
-    const headers = new Headers();
-    headers.append("duque-auth", process.env.AUTH);
-    headers.append("Content-Type", "application/json");
+ async doShit(method, url, dataToSend) {
+    method = method.toUpperCase();
     
-    const res = await request(url, {
-      method,
-      headers,
-      body: dataToSend !== undefined ? JSON.stringify(dataToSend) : undefined,
-    });
-
-    const body = await res.body.json();
-    const { data, message } = body;
-
-    if (message) console.log({ message });
-    return { data, message };
-  };
-
-  try {
-    return await makeRequest();
-  } catch (error) {
-    console.error("Initial request failed:", error.message || error);
-
-    let tries = 0;
-    while (tries < 3) {
-      tries++;
-      await new Promise(resolve => setTimeout(resolve, 1000 * tries));
-      try {
-        return await makeRequest();
-      } catch (err) {
-        console.error(`Retry #${tries} failed:`, err.message || err);
+    const makeRequest = async (clientKey) => {
+      const headers = new Headers();
+      headers.append("duque-auth", process.env.AUTH);
+      headers.append("Content-Type", "application/json");
+      headers.append("duque-client-key", clientKey);
+      
+      const res = await request(url, {
+        method,
+        headers,
+        body: dataToSend !== undefined ? JSON.stringify(dataToSend) : undefined,
+      });
+  
+      const body = await res.body.json();
+      const { data, message } = body;
+  
+      if (message) console.log({ message });
+      return { data, message };
+    };
+  
+    try {
+      return await makeRequest(this.#clientKey);
+    } catch (error) {
+      console.error("Initial request failed:", error.message || error);
+  
+      let tries = 0;
+      while (tries < 3) {
+        tries++;
+        await new Promise(resolve => setTimeout(resolve, 1000 * tries));
+        try {
+          return await makeRequest(this.#clientKey);
+        } catch (err) {
+          console.error(`Retry #${tries} failed:`, err.message || err);
+        }
       }
+  
+      throw new Error("All retries failed after 5 attempts");
     }
-
-    throw new Error("All retries failed after 5 attempts");
   }
 }

@@ -8,20 +8,31 @@ client.init().then(async (_) => {
   const before = Date.now();
   console.log(chalk.bgBlue(`Starting to fetch data....`));
 
-  const bet = guild.bets.cache.at(0);
+  const bet = await guild.bets.create({
+    adminId: "1044050359586394192",
+    creatorId: "1044050359586394192",
+    mode: "mob",
+    price: 13,
+    type: "1v1"
+  });
 
   // await bet.setStatus(STATES.SHUTTED);
   //await bet.setWinner("412347257233604609");
   // await bet.setLoser("1044050359586394192");
   // await bet.addPlayer({ id: "877598927149490186", name: "dqu" });
- // await bet.addChannel({ id: "877598927149490186", type: "da tropa" })
- // await bet.add("embedMessageId", "1377731184095789086")
+  // await bet.addChannel({ id: "877598927149490186", type: "da tropa" })
+  // await bet.add("embedMessageId", "1377731184095789086")
 
-//  const channel = bet.channels.find(ew => ew.type.toLowerCase() === "da tropa");
+  //  const channel = bet.channels.find(ew => ew.type.toLowerCase() === "da tropa");
   //bet.logs.addMessage("oi", "text", "duquesad")
-  const { /* status, channels, winner, loser, players, embedMessageId, */ logs } = bet;
-  console.log({ /* status, channels, winner, loser, players *//*  , embedMessageId, channels, */ logs });
 
+
+  await bet.addChannel({ id: "877598927149490186", type: "created" })
+  await bet.addMessage({ id: "1377731184095789086", type: "embedMessageId" })
+
+  const { /* status, channels, winner, loser, players, embedMessageId, */ logs, messages, channels } = bet;
+
+  console.log({ bet, messages, channels });
   const now = Date.now();
   console.log(`It took`, chalk.bgRed(`${now - before}ms`), "to fetch all data.");
 });

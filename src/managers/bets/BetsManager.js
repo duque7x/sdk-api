@@ -65,6 +65,8 @@ exports.BetsManager = class BetsManager {
 
         this.#rest.emit("betCreate", bet);
         this.#setBet(bet);
+        console.log({ bet });
+        
         return bet;
     }
     async delete(id) {

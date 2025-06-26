@@ -73,7 +73,11 @@ exports.MediatorsManager = class MediatorsManager {
     await this.#rest.request("DELETE", route);
 
     this.#rest.emit("mediatorDelete", this.#mediators.get(id));
-    this.#removeIdFromCache(id);
+    
+    for (let mediatorData of response.mediators) {
+      const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
+      this.#setMediator(mediator);
+    }
     return;
   };
   async removeAll() {

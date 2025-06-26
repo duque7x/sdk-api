@@ -16,6 +16,8 @@ type EventMap = {
 };
 
 export declare class REST extends EventEmitter {
+    constructor(clientKey?: string);
+
     /**
      * Makes a REST request and returns the updated body.
      * @param method HTTP method (e.g., GET, POST)

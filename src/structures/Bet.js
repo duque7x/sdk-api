@@ -11,18 +11,18 @@ class Bet {
      * @param {import("../rest/REST").REST} rest
      */
     constructor(data, rest, guildId) {
-        this.players = data?.players ?? [];
-        this.price = data?.price ?? 1;
-        this.payedBy = data?.payedBy ?? [];
-        this.createdAt = new Date(data.createdAt) ?? new Date();
-        this.updatedAt = new Date(data.updatedAt) ?? new Date();
+        this.players = data?.players || [];
+        this.price = data?.price || 1;
+        this.payedBy = data?.payedBy || [];
+        this.createdAt = new Date(data.createdAt) || new Date();
+        this.updatedAt = new Date(data.updatedAt) || new Date();
 
-        this.channels = data?.channels ?? [];
-        this.winner = data?.winner ?? "";
-        this.loser = data?.loser ?? "";
+        this.channels = data?.channels || [];
+        this.winner = data?.winner || "";
+        this.loser = data?.loser || "";
 
-        this.type = data?.type ?? "4v4";
-        this.mode = data?.mode ?? "misto";
+        this.type = data?.type || "4v4";
+        this.mode = data?.mode || "misto";
         
         this.logs = new LogsManager({
             messages: data?.logs.messages,
@@ -30,18 +30,18 @@ class Bet {
             _id: data?._id
         }, rest);
 
-        this.createdAt = new Date(data?.createdAt) ?? new Date();
-        this.updatedAt = new Date(data?.updatedAt) ?? new Date();
+        this.createdAt = new Date(data?.createdAt) || new Date();
+        this.updatedAt = new Date(data?.updatedAt) || new Date();
 
-        this.status = data?.status ?? "created";
-        this.maximumSize = data?.maximumSize ?? 2;
-        this.teamA = data?.teamA ?? [];
-        this.teamB = data?.teamB ?? [];
-        this.creatorId = data?.creatorId ?? "";
-        this.embedMessageId = data?.embedMessageId ?? "";
-        this.mediatorId = data?.mediatorId ?? "";
-        this.confirmed = data?.confirmed ?? [];
-        this.messages = data?.messages ?? [];
+        this.status = data?.status || "created";
+        this.maximumSize = data?.maximumSize || 2;
+        this.teamA = data?.teamA || [];
+        this.teamB = data?.teamB || [];
+        this.creatorId = data?.creatorId || "";
+        this.embedMessageId = data?.embedMessageId || "";
+        this.mediatorId = data?.mediatorId || "";
+        this.confirmed = data?.confirmed || [];
+        this.messages = data?.messages || [];
         this._id = data?._id;
 
         this.#rest = rest;
