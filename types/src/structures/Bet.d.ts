@@ -5,6 +5,7 @@ import { STATES } from "./Guild";
 import { Player } from "../../../index";
 import { LogsManager } from "../managers/LogsManager";
 import { Collection } from "../structures/Collection";
+import { ChannelManager } from "../managers/ChannelManager";
 
 export interface Confirmed {
     ids: string[];
@@ -48,7 +49,7 @@ export declare class Bet extends BaseMatch {
     payedBy: string;
     mediatorId: string;
     confirmed: Confirmed[];
-    channels: Channel[];
+    channels: ChannelManager;
     messages: Message[];
     status: STATES;
     embedMessageId: string;
@@ -77,7 +78,7 @@ export declare class Bet extends BaseMatch {
     addConfirmed(type: string, id: string): Promise<Confirmed>;
     setConfirmed(set: Confirmed[]): Promise<Confirmed[]>;
 
-    setStatus(status: STATES): Promise<STATES>;
+    setStatus(status: STATES | "off" | "on" | "created" | "shutted"): Promise<STATES>;
     setWinner(userId: string): Promise<string>;
     setLoser(userId: string): Promise<string>;
 

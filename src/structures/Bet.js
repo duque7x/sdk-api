@@ -1,3 +1,4 @@
+const { ChannelManager } = require("../managers/channel/ChannelManager");
 const { LogsManager } = require("../managers/logs/LogsManager");
 const Routes = require("../rest/Routes");
 const assert = require("node:assert");
@@ -10,28 +11,27 @@ class Bet {
      * @param {*} data 
      * @param {import("../rest/REST").REST} rest
      */
-    constructor(data, rest, guildId) {
+    constructor(data, rest, guildId, manager) {
+        this.manager = manager;
+
         this.players = data?.players || [];
         this.price = data?.price || 1;
         this.payedBy = data?.payedBy || [];
-        this.createdAt = new Date(data.createdAt) || new Date();
-        this.updatedAt = new Date(data.updatedAt) || new Date();
 
-        this.channels = data?.channels || [];
         this.winner = data?.winner || "";
         this.loser = data?.loser || "";
 
         this.type = data?.type || "4v4";
         this.mode = data?.mode || "misto";
-        
+
         this.logs = new LogsManager({
             messages: data?.logs.messages,
             guildId,
             _id: data?._id
         }, rest);
 
-        this.createdAt = new Date(data?.createdAt) || new Date();
-        this.updatedAt = new Date(data?.updatedAt) || new Date();
+        this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
+        this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
 
         this.status = data?.status || "created";
         this.maximumSize = data?.maximumSize || 2;
@@ -45,8 +45,16 @@ class Bet {
         this._id = data?._id;
 
         this.#rest = rest;
-        this.#data = data;
         this.guildId = guildId;
+
+        let channelManagerData = {
+            channels: data.channels,
+            baseUrl: Routes.guilds.bets.resource(this.guildId, this._id, "channels"),
+            structure: this,
+            field: "bets",
+            guildId
+        }
+        this.channels = new ChannelManager(channelManagerData, rest);
     }
     get data() {
         return this.#data;
@@ -140,7 +148,8 @@ class Bet {
         const route = Routes.guilds.bets.resource(this.guildId, this._id, "channels");
         const updatedData = await this.#rest.request("PATCH", route, payload);
         this.#updateInternals(updatedData);
-        return updatedData.channels.find(cn => cn.type == payload.type);
+        console.log({ updatedData });
+        return this;
     }
     async addMessage(payload) {
         assert(payload && typeof payload === "object", "Key must be an object");
@@ -213,8 +222,18 @@ class Bet {
     #updateInternals(data) {
         for (let key in data) {
             if (key == "id" || key == "_id" || key == "guildId") continue;
+            if (key == "channels") {
+                for (let chn of data.channels) {
+                    this.channels.set(chn.type, chn);
+                }
+                continue;
+            }
             if (this[key]) this[key] = data[key];
         }
+        this.manager.set(this._id, this);
+    }
+    toString() {
+        return `${this._id}`;
     }
 }
 module.exports = { Bet };
