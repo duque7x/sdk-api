@@ -1,12 +1,14 @@
 
-const { REST, BASESTATUS, BETTYPES, Bet, BetUser, BetUsersManager, BetsManager, Collection, Guild, MATCHTYPES, MatchStatusTypesEnum, MatchTypesEnum, MatchesManager, Routes, STATES, User, UserManager } = require("../index.js");
-const client = new REST();
+const { REST } = require("../index.js");
+const client = new REST().setClientKey("877598927149490186");;
+
+client.init().then(async () => {
+    try {
+        //const guild = client.guilds.cache.get("1341399030282059776");
 
 
-client.init().then(async (_) => {
-    console.log(client.guilds.cache);
-
-    const guild = client.guilds.cache.get("1341399030282059776");
-    const match = await guild.matches.create({ creatorId: "877598927149490186", type: MATCHTYPES.FourVFour })
-    console.log({ match })
+        //const match = await guild.matches.create({ creatorId: "877598927149490186", type: MATCHTYPES.FourVFour })
+    } catch (error) {
+        console.error(error);
+    }
 });

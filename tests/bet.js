@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const { REST, STATES } = require("../index.js");
+const { REST, STATES,  } = require("../index.js");
 const client = new REST().setClientKey("877598927149490186");
 const chalk = require("chalk");
 
@@ -34,20 +34,15 @@ client.init().then(async (_) => {
 
   //const { /* status, channels, winner, loser, players, embedMessageId, */ logs, messages, channels } = bet;
 
-  const ch = await bet.channels.cache.get("1");
-  const ch2 = await bet.channels.create({ id: "dq", type: "2" });
-  const ch3 = await bet.channels.create({ id: "dq", type: "3" });
+  // const ch = await bet.channels.cache.get("1");
+  // const ch2 = await bet.channels.create({ id: "dq", type: "2" });
+  //const ch3 = await bet.channels.create({ id: "dq", type: "3" });
 
   //await bet.channels.delete("frw");
 
-  console.log({ channelBefore: ch.id });
-  await ch.setId("999999999999999999999");
-  console.log({ channelAfter: ch.id });
-
-
-
-  console.log({ betCacheAfter: bet.channels.cache });
-
+  console.log({ channelBefore: bet.channels.cache });
+  await bet.channels.setTo([{ id: "save", type: "23444" }, { id: "lol", type: "465675" }]);
+  console.log({ channelAfter: bet.channels.cache });
 
   const now = Date.now();
   console.log(`It took`, chalk.bgRed(`${now - before}ms`), "to fetch all data.");

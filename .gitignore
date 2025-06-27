@@ -129,3 +129,4 @@ dist
 .pnp.*
 test.test.js
 /tests
+/tests
