@@ -1,55 +1,8 @@
+import { BetUserData, DailyWins } from "../../..";
 import { REST } from "../rest/REST";
 import { BaseUser } from "./BaseUser";
 
-type BetUserData = {
-  name?: string;
-  id?: string;
-  /**
-  * The amount of credit the player has achieved.
-  * @default 0
-  */
-  credit?: number;
 
-  /**
-* The number of MVPs the player has achieved.
-* @default 0
-*/
-  mvps?: number;
-
-  /**
- * The number of losses the player has suffered.
- * @default 0
- */
-  losses?: number;
-
-  /**
-   * Indicates whether the player is blacklist.
-   * @default false
-   */
-  blacklist?: boolean;
-
-  wins?: number;
-  betsPlayed?: string[];
-
-  type?: "add" | "remove" | string;
-
-  createdAt?: Date;
-  updatedAt?: Date;
-  coins?: number;
-  dailyWins?: DailyWins;
-  profileCard?: {
-    description?: string;
-    banner?: {
-      equipped: number;
-      allowed: number[];
-    };
-  }
-}
-
-type DailyWins = {
-  amount: number;
-  date: Date;
-}
 export class BetUser extends BaseUser {
   credit: number;
   betsPlayed?: string[];
@@ -85,4 +38,9 @@ export class BetUser extends BaseUser {
   setBlacklist(value: boolean): Promise<BetUser>;
 
   setBanner(id: number): Promise<BetUser>;
+
+  /**
+     * Returns a string representation of this structure
+     */
+  toString(): string;
 }

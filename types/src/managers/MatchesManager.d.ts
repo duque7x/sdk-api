@@ -19,6 +19,18 @@ export class MatchesManager {
   constructor(rest: REST);
 
   /**
+   * Returns a collection of matches
+   */
+  get cache(): Collection<string, Match>;
+
+  /**
+  * Creates a new match.
+  * @param payload - The payload to create the match with.
+  * @returns A promise resolving to the created match data.
+  */
+  create(payload: MatchCreatePayload): Promise<Match>;
+
+  /**
    * Fetches a match by its ID.
    * @param id - The unique ID of the match.
    * @returns A promise resolving to the match data.
@@ -26,11 +38,19 @@ export class MatchesManager {
   fetch(id: string): Promise<Match>;
 
   /**
-   * Creates a new match.
-   * @param payload - The payload to create the match with.
-   * @returns A promise resolving to the created match data.
-   */
-  create(payload: MatchCreatePayload): Promise<Match>;
+  * Fetches all matches in a guild
+  */
+  fetchAll(): Promise<Match>;
 
-  get cache(): Collection<string, Match>;
+  /**
+  * Deletes a match by its ID.
+  * @param id - The unique ID of the match.
+  */
+  delete(id: string): Promise<Col>;
+
+  /**
+   * Deletes all match by its ID.
+   * @param id - The unique ID of the match.
+   */
+  deleteAll(): Promise<boolean>;
 }

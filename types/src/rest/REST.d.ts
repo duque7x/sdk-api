@@ -6,16 +6,11 @@ import { Match } from "../structures/Match";
 import { Guild } from "../structures/Guild";
 import { BetUser } from "../structures/BetUser";
 import { EventEmitter } from 'events'; // Import if needed
-
-type EventMap = {
-    userCreate: User;
-    betUserCreate: BetUser;
-    betUpdate: Bet;
-    guildDelete: Guild;
-    matchEnd: Match;
-};
-
 export declare class REST extends EventEmitter {
+    /**
+     * @param clientKey This is the key that allows customers to have acess to the bots!
+     * Can not be bypassed by anyone
+     */
     constructor(clientKey?: string);
 
     /**
@@ -33,6 +28,7 @@ export declare class REST extends EventEmitter {
     init(): Promise<void>;
 
     guilds: GuildsManager;
+    
     users: Collection<string, User>;
     betUsers: Collection<string, BetUser>;
     bets: Collection<string, Bet>;

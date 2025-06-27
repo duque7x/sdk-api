@@ -4,44 +4,9 @@ import { BetsManager } from "../managers/BetsManager";
 import { BetUsersManager } from "../managers/BetUsersManager";
 import { REST } from "../rest/REST";
 import { MediatorsManager } from "../managers/MediatorsManager";
+import { BlackListed, Emoji, GroupedChannel, GuildData, GUILDSTATUS, NormalGuildKeys, NormalMessage, Role } from "../../..";
 
-interface Channel {
-    ids: string[];
-    type: string;
-}
 
-interface Message {
-    ids: string[];
-    type: string;
-}
-interface Emoji {
-    id: string;
-    type: string;
-    animated: boolean;
-}
-
-interface Role {
-    ids: string[];
-    type: string;
-}
-interface GuildData {
-    prefix: string;
-    id: string;
-    name: string;
-
-    _id: string;
-    pricesOn: number[];
-    pricesAvailable: number[];
-    status: GUILDSTATUS;
-    seasonId: string;
-    betsChannelId: string;
-    mediators: MediatorsManager;
-}
-interface BlackListed {
-    id: string;
-    addedBy: string;
-    when: Date
-}
 export class Guild {
     blacklist: BlackListed[];
 
@@ -49,12 +14,12 @@ export class Guild {
     id: string;
     seasonId: string;
 
-    channels: Channel[];
+    channels: GroupedChannel[];
 
-    categories: Channel[];
+    categories: GroupedChannel[];
 
     roles: Role[];
-    messages: Message[];
+    messages: NormalMessage[];
     emojis: Emoji[];
 
     name: string;
@@ -73,17 +38,17 @@ export class Guild {
 
     get data(): GuildData;
 
-    add<F extends keyof KeysAvailable, A = KeysAvailable[F]>(
+    add<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
         key: F,
         value: A
     ): Promise<A>;
 
-    remove<F extends keyof KeysAvailable, A = KeysAvailable[F]>(
+    remove<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
         key: F,
         value: A
     ): Promise<A>;
 
-    set<F extends keyof KeysAvailable, A = KeysAvailable[F]>(
+    set<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
         key: F,
         value: A
     ): Promise<A>;
@@ -106,49 +71,4 @@ export class Guild {
 
     addEmoji(type: string, id: string, animated?: boolean): Promise<Guild>;
     removeEmoji(type: string, id: string): Promise<Guild>;
-}
-export declare enum STATES {
-    "ON" = "on",
-    "OFF" = "off",
-    "CREATED" = "created",
-    "SHUTTED" = "shutted",
-    "WAITING" = "waiting",
-}
-export declare enum BASESTATUS {
-    "ON" = "on",
-    "OFF" = "on",
-}
-interface Mediator {
-    name?: string;
-    id: string, joinedAt?: Date;
-    paymentLinks?: string[]
-}
-type KeysAvailable = {
-    blacklist: BlackListed;
-    prefix: string;
-    pricesOn: number;
-    pricesAvailable: number;
-    status: GUILDSTATUS;
-    seasonId: string;
-
-    mediators: Mediator[];
-
-
-    channels: {
-        dailyRank: Channel;
-        blacklist: Channel
-    };
-
-    categories: {
-        bets: Channel;
-        betsChannel: Channel;
-    };
-
-    roles: Role[];
-};
-type GUILDSTATUS = {
-    bets: "on" | "off";
-    matches: "on" | "off";
-    dailyRank: "on" | "off";
-    createVoiceChannels: "on" | "off"
 }

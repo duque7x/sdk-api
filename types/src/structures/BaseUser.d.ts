@@ -1,7 +1,3 @@
-export interface Player {
-
-};
-
 export class BaseUser {
   constructor();
 
@@ -10,15 +6,15 @@ export class BaseUser {
 
   guildId: string;
   /**
- * The number of wins the player has.
- * @default 0
- */
+   * The number of wins the player has.
+   * @default 0
+  */
   wins: number;
 
   /**
-* The number of MVPs the player has achieved.
-* D@default 0
-*/
+  * The number of MVPs the player has achieved.
+  * D@default 0
+  */
   mvps: number;
 
   /**
@@ -33,8 +29,18 @@ export class BaseUser {
    */
   blacklist: boolean;
 
+  /**
+     * The date of the creation of the user
+     */
   createdAt: Date;
+
+  /**
+   * The last date where the user was updated
+   */
   updatedAt: Date;
 
+  /**
+       * Returns a string representation of this structure
+       */
   toString(): string;
 }

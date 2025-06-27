@@ -1,42 +1,68 @@
-import { BETTYPES } from "../payloads/BetCreatePayload";
-import { MATCHTYPES } from "../payloads/MatchCreatePayload";
+import { BETTYPES, MATCHTYPES, Players, STATES } from "../../..";
 import { REST } from "../rest/REST";
-import { STATES } from "./Guild";
+import { Bet } from "./Bet";
+import { Match } from "./Match";
 
-export declare interface Player {
-    /**
-     * The unique id of the player
-     */
-    id: string;
-
-    /**
-     * The name of the player
-     */
-    name: string;
-}
-/**
- * An array of players
- */
-export declare type Players = Player[];
 
 export class BaseMatch {
-    constructor(data: any, rest: REST, guildId: string): void;
-    type: MATCHTYPES | BETTYPES | string;
+    /**
+     * This is the base for a match or queue
+     * @param data Bet or a Match
+     * @param rest Instance of REST
+     */
+    constructor(data: Match | Bet, rest: REST);
 
+    /**
+     * The unique id of the match
+     */
+    _id: string;
+    /**
+     * This is the type of the match
+     */
+    type: MATCHTYPES;
+
+    /**
+     * Status of the match
+     */
     status: STATES;
 
+    /**
+     * The winners of the match
+     */
     winners: string;
 
-    maximumSize: string;
+    /**
+     * The maximum size of players in a match
+     */
+    maximumSize: number;
 
+    /**
+     * The creator id of the match
+     */
     creatorId: string;
 
+    /**
+     * An array of the players in the given match
+     */
     players: Players;
 
+    /**
+     * A string of the guild id
+     */
     guildId: string;
 
+    /**
+     * The date of the creation of the match
+     */
     createdAt: Date;
+
+    /**
+     * The last date where the match was updated
+     */
     updatedAt: Date;
 
+    /**
+     * Returns a string representation of this structure
+     */
     toString(): string;
 }

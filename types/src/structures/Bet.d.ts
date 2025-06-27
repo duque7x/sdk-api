@@ -1,68 +1,73 @@
-import { BETTYPES } from "../payloads/BetCreatePayload";
-import { REST } from "../rest/REST";
 import { BaseMatch } from "./BaseMatch";
-import { STATES } from "./Guild";
-import { Player } from "../../../index";
+import { Confirmed, NormalMessage, Player, STATES, BETTYPES, REST, BetData, BasicChannelData } from "../../../index";
 import { LogsManager } from "../managers/LogsManager";
-import { Collection } from "../structures/Collection";
 import { ChannelManager } from "../managers/ChannelManager";
-
-export interface Confirmed {
-    ids: string[];
-    type: string;
-    count: number;
-}
-export interface Channel {
-    id: string;
-    type: string;
-}
-export interface Message {
-    id: string;
-    type: string;
-}
-
-export interface BetData {
-    type: BETTYPES;
-    price: number;
-    payedBy: string;
-    mediatorId: string;
-    confirmed: Confirmed[];
-    channels: Channel[];
-    messages: Message[];
-    status: STATES;
-    embedMessageId: string;
-    winner: string;
-    loser: string;
-    teamA: string;
-    teamB: string;
-    creatorId: string;
-    adminId: string;
-    _id: string;
-}
 
 /**
  * Bet class containing data and methods about the bet in place.
  */
 export declare class Bet extends BaseMatch {
-    type: BETTYPES;
+    /**
+     * The price of the bet
+     */
     price: number;
+
+    /**
+     * Who has payed the bet
+     */
     payedBy: string;
+
+    /**
+     * The mediator of the bet
+     */
     mediatorId: string;
-    confirmed: Confirmed[];
-    channels: ChannelManager;
-    messages: Message[];
-    status: STATES;
-    embedMessageId: string;
-    winner: string;
-    loser: string;
-    teamA: string;
-    teamB: string;
-    creatorId: string;
+
+    /**
+  * The administrator of the bet
+  */
     adminId: string;
+
+    /**
+     * The confirmed entries from the players
+     */
+    confirmed: Confirmed[];
+
+    /**
+     * The channels of the bet
+     */
+    channels: ChannelManager;
+
+    /**
+     * An array of messages of the bet
+     */
+    messages: NormalMessage[];
+
+    /**
+     * The id of the embed message of the bet
+     */
+    embedMessageId: string;
+
+    /**
+     * The _id of the bet
+     */
     _id: string;
+
+    /**
+     * The mode of the bet
+     */
     mode: string;
+
+    /**
+     * The manager of logs in a given bet
+     */
     logs: LogsManager;
-    
+
+    /**
+     * 
+     * @param data 
+     * @param rest 
+     * @param guildId 
+     */
     constructor(data: BetData, rest: REST, guildId: string);
 
     get data(): BetData;
@@ -82,7 +87,12 @@ export declare class Bet extends BaseMatch {
     setWinner(userId: string): Promise<string>;
     setLoser(userId: string): Promise<string>;
 
-    addChannel(payload: Channel): Promise<Channel>;
-    addMessage(payload: Message): Promise<Message>;
-    setChannels(channels: Channel[]): Promise<Channel[]>;
+    addChannel(payload: BasicChannelData): Promise<BasicChannelData>;
+    addMessage(payload: NormalMessage): Promise<NormalMessage>;
+    setChannels(channels: BasicChannelData[]): Promise<BasicChannelData[]>;
+
+    /**
+     * Returns a string representation of this structure
+     */
+    toString(): string;
 }

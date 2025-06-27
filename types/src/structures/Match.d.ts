@@ -1,70 +1,16 @@
-import { MATCHTYPES, Player, STATES } from "../../..";
+import { ChannelInfo, ConfirmedPlayer, MATCHSTATUS, MATCHTYPES, Player, Players, STATES } from "../../..";
+import { BaseMatch } from "./BaseMatch";
 
-declare enum MATCHSTATUS {
-    ON = "ON",           // Match is active
-    OFF = "OFF",         // Match is inactive
-    CREATED = "CREATED", // Match was created but not started
-    SHUTTED = "SHUTTED"  // Match was forcefully closed
-}
-
-/**
- * Type alias for an array of match players.
- */
-declare type MatchPlayers = Player[];
-
-/**
- * Interface for confirmed players including the type of confirmation.
- */
-declare interface ConfirmedPlayer {
-    /** The unique Discord user ID of the player */
-    id: string;
-
-    /** The name of the player */
-    name: string;
-
-    /** Type of confirmation, e.g., "manual", "auto", etc. */
-    typeConfirm: string;
-
-    setted: boolean;
-}
-
-/**
- * Interface representing a channel (text or voice).
- */
-declare interface ChannelInfo {
-    /** The channel ID */
-    id: string;
-
-    /** The name of the channel */
-    name: string;
-}
 
 /**
  * Interface representing a full match object.
  */
-export declare class Match {
-    /** Unique ID for the match (MongoDB ObjectId as string) */
-    _id: string;
-
-    guildId: string;
-
-    /** All players involved in the match */
-    players: Player[];
-
-    /** Timestamp of when the match was created */
-    createdAt: Date;
-
+export declare class Match extends BaseMatch {
     /** The main text channel associated with this match */
     matchChannel: ChannelInfo;
 
     /** Array of associated voice channels */
     voiceChannels: ChannelInfo[];
-
-    /** Type of the match (e.g., 1x1, 2x2...) */
-    type: MATCHTYPES;
-
-    /** Current status of the match */
-    status: MATCHSTATUS;
 
     /** Players who won the match */
     winnerTeam: string;
@@ -76,16 +22,13 @@ export declare class Match {
     creatorId: string;
 
     /** Team A players */
-    teamA: MatchPlayers;
+    teamA: Players;
 
     /** Team B players */
-    teamB: MatchPlayers;
-
-    /** Players who lost the match */
-    losers: string;
+    teamB: Players;
 
     /** Team leaders or captains */
-    leaders: MatchPlayers;
+    leaders: Players;
 
     /** The player who created the match room */
     roomCreator: Player;
@@ -100,4 +43,9 @@ export declare class Match {
     removePlayer(id: string): Promise<Match>;
 
     setStatus(status: MATCHSTATUS): Promise<Match>;
+
+    /**
+     * Returns a string representation of this structure
+     */
+    toString(): string;
 }

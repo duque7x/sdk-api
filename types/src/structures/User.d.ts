@@ -1,30 +1,6 @@
+import { BaseUserNumericFields, UserOriginalChannel, UserProtection } from "../../..";
 import { BaseUser } from "./BaseUser";
 
-/**
- * Represents a protection type with additional details.
- */
-declare interface UserProtection {
-  type: "point_protect" | "immunity" | "double_points"; // Type of protection
-  longevity: number; // Duration for which the protection lasts
-  addedBy: string; // User who added the protection
-  when: Date; // When the protection was added
-}
-
-/**
- * Represents a channel associated with a player's original channels.
- */
-interface UserOriginalChannel {
-  channelId: string; // The ID of the channel
-  matchId: string; // The ID of the match associated with the channel
-}
-type UserNumericOrCarFields = {
-  wins: number;
-  points: number;
-  mvps: number;
-  losses: number;
-  gamesPlayed: string[];
-  blacklisted: boolean;
-};
 
 /**
  * Interface representing a Player's stats and other information in the database.
@@ -67,7 +43,7 @@ export class User extends BaseUser {
    * @param key Optional field to reset
    * @returns this
    */
-  reset<F extends keyof UserNumericOrCarFields>(key?: F): Promise<this>;
+  reset<F extends keyof BaseUserNumericFields>(key?: F): Promise<this>;
 
   /**
    * Deletes the user's data, cannot be undone
@@ -80,7 +56,7 @@ export class User extends BaseUser {
    * @param amount The amount to increment by
    * @returns this
    */
-  add<F extends keyof UserNumericOrCarFields, A = UserNumericOrCarFields[F]>(
+  add<F extends keyof BaseUserNumericFields, A = BaseUserNumericFields[F]>(
     field: F,
     amount: A
   ): Promise<A>;
@@ -91,7 +67,7 @@ export class User extends BaseUser {
    * @param amount The amount to decrement by
    * @returns this
    */
-  remove<F extends keyof UserNumericOrCarFields>(
+  remove<F extends keyof BaseUserNumericFields>(
     field: F,
     amount: number
   ): Promise<this>;
@@ -102,8 +78,8 @@ export class User extends BaseUser {
    * @param value The value to assign
    * @returns this
    */
-  set<F extends keyof UserNumericOrCarFields>(
+  set<F extends keyof BaseUserNumericFields>(
     key: F,
-    value: UserNumericOrCarFields[F]
+    value: BaseUserNumericFields[F]
   ): Promise<this>;
 }

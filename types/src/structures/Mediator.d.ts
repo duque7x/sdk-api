@@ -1,13 +1,5 @@
+import { MediatorData } from "../../..";
 import { REST } from "../rest/REST";
-
-declare type MediatorData = {
-    id: string;
-    name: string;
-    paymentLinks: string[];
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 export class Mediator {
     id: string;
     name: string;
@@ -23,4 +15,9 @@ export class Mediator {
 
     setLinks(link: string): Promise<string[]>;
     removeLink(link: string): Promise<string[]>;
+
+    /**
+     * Returns a string representation of this structure
+     */
+    toString(): string;
 }
