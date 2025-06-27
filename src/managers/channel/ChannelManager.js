@@ -27,7 +27,28 @@ exports.ChannelManager = class {
   get cache() {
     return this.#channels;
   }
+  async setTo(channels) {
+    channels = this.resolvePayload(channels);
+    assert(channels && typeof channels === "object", `${channels} must be an object`);
 
+    const route = this.baseUrl;
+    const response = await this.#rest.request("PATCH", route, { set: channels });
+    console.log({
+      response,
+      route,
+      channels
+    });
+
+    this.#channels.clear();
+    for (let channelData of response) {
+      this.#set(channelData);
+    }
+    return this.#channels;
+  }
+  resolvePayload(payload) {
+    if (!Array.isArray(payload)) payload = [payload];
+    return payload;
+  }
   set(id, channel) {
     assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
     return this.#set(channel);
@@ -37,7 +58,7 @@ exports.ChannelManager = class {
 
     const route = Routes.fields(this.baseUrl, type);
     const response = await this.#rest.request("GET", route);
-    return this.#set(response);;
+    return this.#set(response);
   }
   async fetchAll() {
     const response = await this.#rest.request("GET", this.baseUrl);
@@ -69,8 +90,9 @@ exports.ChannelManager = class {
 
   async deleteAll() {
     const route = this.baseUrl;
-    await this.#rest.request("DELETE", route);
+    const value = await this.#rest.request("DELETE", route);
     this.#channels.clear();
+    return value;
   }
   #removeIdFromCache(id) {
     this.#channels.delete(id);

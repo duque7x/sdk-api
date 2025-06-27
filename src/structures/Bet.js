@@ -34,7 +34,7 @@ class Bet {
         this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
 
         this.status = data?.status || "created";
-        this.maximumSize = data?.maximumSize || 2;
+        this.maximumSize = Number(data?.maximumSize) || 2;
         this.teamA = data?.teamA || [];
         this.teamB = data?.teamB || [];
         this.creatorId = data?.creatorId || "";
@@ -55,6 +55,9 @@ class Bet {
             guildId
         }
         this.channels = new ChannelManager(channelManagerData, rest);
+    }
+    toString() {
+        return `${this._id}`;
     }
     get data() {
         return this.#data;
@@ -141,15 +144,7 @@ class Bet {
         return this;
     };
     async addChannel(payload) {
-        assert(payload && typeof payload === "object", "Key must be an object");
-        assert(payload.id, "Channel.id must be present");
-        assert(payload.type, "Channel.type must be present");
-
-        const route = Routes.guilds.bets.resource(this.guildId, this._id, "channels");
-        const updatedData = await this.#rest.request("PATCH", route, payload);
-        this.#updateInternals(updatedData);
-        console.log({ updatedData });
-        return this;
+        return this.channels.create(payload);
     }
     async addMessage(payload) {
         assert(payload && typeof payload === "object", "Key must be an object");
@@ -231,9 +226,6 @@ class Bet {
             if (this[key]) this[key] = data[key];
         }
         this.manager.set(this._id, this);
-    }
-    toString() {
-        return `${this._id}`;
     }
 }
 module.exports = { Bet };

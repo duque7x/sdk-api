@@ -3,7 +3,7 @@ const Routes = require("../../rest/Routes");
 const assert = require("node:assert");
 const { Collection } = require("../../structures/Collection");
 
-exports.LogsManager = class {
+exports.LogsManager = class  {
     #logs;
     #rest;
     #baseUrl;
@@ -19,17 +19,29 @@ exports.LogsManager = class {
         this.messages = new Collection();
         this.#updateMessages(data.messages);
     }
-    async addMessage(content, type, userId) {
-        assert(content && typeof content === "string" || typeof content === "object", "Content must be a string");
-        assert(type && typeof type === "string", "Type must be present");
-        assert(userId && typeof userId === "string", "User Id must be present");
+    async addMessage(content, id, type) {
+        content = this.resolveContent(content);
+        type = this.resolveType(type);
 
-        const payload = { content, type, userId };
+        assert(content && typeof content === "string", "Content must be a string");
+        assert(id && typeof id === "string", "User Id must be present");
+
+        const payload = { type, id, content };
         const route = Routes.fields(this.#baseUrl, "messages");
-        const updatedData = await this.#rest.request("PATCH", route, payload);
+        const updatedData = await this.#rest.request("POST", route, payload);
 
-        this.#updateMessages(updatedData.logs.messages);
+        this.#updateMessages(updatedData.logs);
         return updatedData.messages;
+    }
+    resolveContent(content) {
+        if (!content) return null;
+        if (typeof content === "string") return content;
+        if (typeof content === "object") return String(content.toString());
+    }
+    resolveType(type) {
+        if (!type) type = 'txt';
+        if (typeof type !== "string") type = String(type);
+        return type;
     }
     #updateMessages(messages) {
         if (typeof messages === "object") {

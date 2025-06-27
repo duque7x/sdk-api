@@ -16,6 +16,9 @@ exports.Channel = class {
         this.#guildId = data?.guildId;
         this.#rest = rest;
     }
+    toString() {
+        return `<#${this.id}>`;
+    }
     async setId(id) {
         assert(id && typeof id == "string", "Channel id must be a string");
 

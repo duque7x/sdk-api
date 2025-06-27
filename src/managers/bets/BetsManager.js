@@ -3,7 +3,7 @@ const { Bet } = require("../../structures/Bet");
 const Routes = require("../../rest/Routes");
 const assert = require("node:assert");
 
-exports.BetsManager = class BetsManager {
+exports.BetsManager = class {
     #bets;
     #rest;
     /**
@@ -69,9 +69,9 @@ exports.BetsManager = class BetsManager {
     async deleteAll() {
         const route = Routes.guilds.bets.deleteAll(this.guildId);
         this.#rest.emit("betsDelete", this.#bets);
-        await this.#rest.request("DELETE", route, { guildId: this.guildId });
+        const value = await this.#rest.request("DELETE", route, { guildId: this.guildId });
         this.#bets.clear();
-        return;
+        return value;
     };
     #remove(id) {
         this.#bets.delete(id);

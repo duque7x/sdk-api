@@ -28,6 +28,9 @@ class User {
 
     this.guildId = guildId;
   }
+  toString() {
+    return `<@${this.id}>`;
+  }
   get data() {
     return this.#data;
   }
@@ -97,9 +100,6 @@ class User {
     }
 
     this.manager.set(data.id, data);
-  }
-  toString() {
-    return `<@${this.id}>`;
   }
 }
 

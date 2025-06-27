@@ -2,8 +2,7 @@ const { Collection } = require("../../structures/Collection");
 const { User } = require("../../structures/User");
 const Routes = require("../../rest/Routes");
 const assert = require("node:assert");
-
-class UsersManager {
+exports.UsersManager = class {
   #rest;
   #users;
   constructor(data, rest) {
@@ -76,20 +75,20 @@ class UsersManager {
   };
   async deleteAll() {
     const route = Routes.guilds.users.deleteAll(this.guildId);
-    await this.#rest.request("DELETE", route);
+    const value = await this.#rest.request("DELETE", route);
 
     this.#users.clear();
-    return;
+    return value;
   };
-  async update(payload) {
+  async update(id, payload) {
     assert(payload && typeof payload === "object", "Payload must be an object");
-    assert(payload.id && typeof payload.id === "string", "Payload id must be a string");
+    assert(id && typeof id === "string", "Id must be a string");
     assert(payload.name && typeof payload.name === "string", "Payload must include name");
     payload.guildId = this.guildId;
 
-    const route = Routes.guilds.users.get(payload.id, this.guildId);
+    const route = Routes.guilds.users.get(id, this.guildId);
     const response = await this.#rest.request("PATCH", route, payload);
-    const userBefore = this.#users.get(payload.id);
+    const userBefore = this.#users.get(id);
     const user = new User(response, this.#rest, this.guildId, this);
 
     this.#rest.emit("userUpdate", userBefore, user);
@@ -107,4 +106,3 @@ class UsersManager {
     for (let user of data || []) this.#set(user);
   }
 };
-exports.UsersManager = UsersManager;

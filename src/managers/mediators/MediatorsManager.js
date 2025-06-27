@@ -3,7 +3,7 @@ const { Collection } = require("../../structures/Collection");
 const { Mediator } = require("../../structures/Mediator");
 const Routes = require("../../rest/Routes");
 const assert = require("node:assert");
-exports.MediatorsManager = class MediatorsManager {
+exports.MediatorsManager = class {
   #rest;
   #mediators;
   constructor(data, rest) {
@@ -80,22 +80,22 @@ exports.MediatorsManager = class MediatorsManager {
   };
   async removeAll() {
     const route = Routes.guilds.mediators.deleteAll(this.guildId);
-    await this.#rest.request("DELETE", route);
+    const value = await this.#rest.request("DELETE", route);
 
     this.#mediators.clear();
-    return;
+    return value;
   };
-  async update(payload) {
+  async update(id, payload) {
+    assert(id && typeof id === "string", "Id must be a string");
     assert(payload && typeof payload === "object", "Payload must be an object");
 
-    const route = Routes.guilds.mediators.update(payload.id, this.guildId);
+    const route = Routes.guilds.mediators.update(id, this.guildId);
     const response = await this.#rest.request("PATCH", route);
-    const medBefore = this.#mediators.get(payload.id);
-    const mediator = new Mediator(response, this.#rest, this.guildId, this);
+
+    const medBefore = this.#mediators.get(id);
+    const mediator = this.#set(response);
 
     this.#rest.emit("mediatorUpdate", medBefore, mediator);
-    this.#set(mediator);
-
     return mediator;
   }
   #set(mediator) {

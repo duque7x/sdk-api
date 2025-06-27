@@ -17,6 +17,9 @@ exports.Mediator = class {
         this.#data = data;
         this.guildId = guildId;
     }
+    toString() {
+        return `<@${this.id}>`;
+    }
     get data() {
         return this.#data;
     }
@@ -53,8 +56,5 @@ exports.Mediator = class {
         }
 
         this.manager.set(data.id, data);
-    }
-    toString() {
-        return `<@${this.id}>`;
     }
 }

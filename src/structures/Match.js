@@ -17,7 +17,8 @@ class Match {
         this.creatorId = data?.creatorId;
         this.players = data?.players;
         this.kickedOut = data?.kickedOut;
-        this.maximumSize = data?.maximumSize;
+
+        this.maximumSize = Number(data?.maximumSize) || 2;
         this.teamA = data?.teamA;
         this.teamB = data?.teamB;
         this.confirmed = data?.confirmed;
@@ -29,6 +30,9 @@ class Match {
         this.#rest = rest;
 
         this.guildId = guildId;
+    }
+    toString() {
+        return `${this._id}`;
     }
     get data() {
         return this.#data;
@@ -99,9 +103,6 @@ class Match {
             if (this[key]) this[key] = data[key];
         }
         this.manager.set(this._id, this);
-    }
-    toString() {
-        return `${this._id}`;
     }
 }
 

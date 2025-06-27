@@ -31,6 +31,9 @@ exports.BetUser = class {
 
     this.guildId = guildId ?? "";
   }
+  toString() {
+    return `<@${this.id}>`;
+  }
   get data() {
     return this.#data;
   }
@@ -168,9 +171,5 @@ exports.BetUser = class {
       if (this[key] !== undefined) this[key] = data[key];
     }
     this.manager.set(this.id, this);
-  }
-
-  toString() {
-    return `<@${this.id}>`;
   }
 }

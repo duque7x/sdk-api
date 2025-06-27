@@ -32,8 +32,8 @@ exports.BetUsersManager = class {
     assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
     assert(name && typeof name === "string", `${name} must be a string`);
 
-    const route = Routes.guilds.betUsers.delete(id, this.guildId);
-    const payload = { id, name, reset: true };
+    const route = Routes.guilds.betUsers.update(id, this.guildId);
+    const payload = { name, reset: true };
     const response = await this.#rest.request("DELETE", route, payload);
 
     const user = this.#set(response.betUsers.find(u => u.id == id));
@@ -80,13 +80,12 @@ exports.BetUsersManager = class {
     return user;
   }
 
-  async update(payload) {
+  async update(id, payload) {
     assert(payload && typeof payload === "object", "Payload must be an object");
-    assert(payload.id && typeof payload.id === "string", "Payload id must be a string");
+    assert(id && typeof id === "string", "Id must be a string");
     assert(payload.name && typeof payload.name === "string", "Payload must include name");
-    payload.guildId = this.guildId;
 
-    const route = Routes.guilds.betUsers.update(payload.id, this.guildId);  // Use correct route
+    const route = Routes.guilds.betUsers.update(id, this.guildId);  // Use correct route
     const response = await this.#rest.request("PATCH", route, payload);
     const userBefore = this.#betUsers.get(payload.id);
     const user = this.#set(response);
@@ -108,9 +107,11 @@ exports.BetUsersManager = class {
 
   async deleteAll() {
     const route = Routes.guilds.betUsers.deleteAll(this.guildId);
-    await this.#rest.request("DELETE", route, { guildId: this.guildId });
+    const value = await this.#rest.request("DELETE", route, { guildId: this.guildId });
     this.#rest.emit("betUsersDelete", this.#betUsers);
     this.#betUsers.clear();
+
+    return value;
   }
 
   #removeIdFromCache(id) {

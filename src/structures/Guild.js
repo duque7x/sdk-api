@@ -29,11 +29,11 @@ class Guild {
         this.channels = data?.channels ?? {};;
         this.categories = data?.categories ?? {};;
 
-        this.users = new UsersManager({ users: data.users, guildId: this.id }, rest);
-        this.betUsers = new BetUsersManager({ betUsers: data.betUsers, guildId: this.id }, rest);
-        this.bets = new BetsManager({ bets: data.bets, guildId: this.id }, rest);
-        this.matches = new MatchesManager({ matches: data.matches, guildId: this.id }, rest);
-        this.mediators = new MediatorsManager({ mediators: data.mediators, guildId: this.id }, rest);
+        this.users = new UsersManager({ users: data?.users, guildId: this.id }, rest);
+        this.betUsers = new BetUsersManager({ betUsers: data?.betUsers, guildId: this.id }, rest);
+        this.bets = new BetsManager({ bets: data?.bets, guildId: this.id }, rest);
+        this.matches = new MatchesManager({ matches: data?.matches, guildId: this.id }, rest);
+        this.mediators = new MediatorsManager({ mediators: data?.mediators, guildId: this.id }, rest);
 
         this.#rest = rest;
         this.#data = data;
@@ -45,7 +45,9 @@ class Guild {
         this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
         this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
     }
-
+    toString() {
+        return `${this._id}`;
+    }
     get data() {
         return this.#data;
     }
@@ -347,9 +349,6 @@ class Guild {
                 this.initialize([], [], [], [], mediators);
             }
         }
-    }
-    toString() {
-        return `${this._id}`;
     }
 }
 
