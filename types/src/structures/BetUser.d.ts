@@ -70,9 +70,9 @@ export class BetUser extends BaseUser {
 
   add<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUser>;
 
-  remove<F extends keyof BetUserData, A = BetUserData[F]>(field: F | string, amount: A): Promise<BetUser>;
+  remove<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUser>;
 
-  set<F extends keyof BetUserData, A = BetUserData[F]>(key: F | string, value: A): Promise<BetUser>;
+  set<F extends keyof BetUserData, A = BetUserData[F]>(key: F, value: A): Promise<BetUser>;
 
   setDescription(description: string): Promise<BetUser>;
 

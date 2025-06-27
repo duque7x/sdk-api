@@ -6,20 +6,21 @@ const assert = require("node:assert");
 class UsersManager {
   #rest;
   #users;
-  constructor(rest, guildId) {
+  constructor(data, rest) {
     this.#rest = rest;
     this.#users = new Collection();
-    this.guildId = guildId;
+
+    this.guildId = data?.guildId;
+    this.#updateUsers(data?.users);
   }
   get cache() {
     return this.#users;
   }
   set(id, user) {
     assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
-    assert(user && user instanceof User, `${user} must be an instance of User`);
 
-    this.#setUser(user);
-    return;
+    user = user instanceof User ? user : new User(user, this.#rest, this.guildId, this);
+    return this.#set(user);
   }
 
   async fetch(id, name) {
@@ -29,21 +30,20 @@ class UsersManager {
     const route = Routes.guilds.users.get(id, this.guildId);
     const payload = { guildId: this.guildId };
     const response = await this.#rest.request("GET", route, payload);
-    const user = new User(response, this.#rest, this.guildId);
+    const user = new User(response, this.#rest, this.guildId, this);
 
-    this.#setUser(user);
+    this.#set(user);
     return user;
   };
 
   async fetchAll() {
     const route = Routes.guilds.users.getAll(this.guildId);
-    const payload = { guildId: this.guildId };
-    const response = await this.#rest.request("GET", route, payload);
+    const response = await this.#rest.request("GET", route);
 
     this.#users.clear();
     for (let userData of response) {
-      const user = new User(userData, this.#rest, this.guildId);
-      this.#setUser(user);
+      const user = new User(userData, this.#rest, this.guildId, this);
+      this.#set(user);
     }
     return this.#users;
   };
@@ -56,10 +56,10 @@ class UsersManager {
 
     const route = Routes.guilds.users.create(this.guildId)
     const response = await this.#rest.request("POST", route, payload)
-    const user = new User(response, this.#rest, this.guildId);
+    const user = new User(response, this.#rest, this.guildId, this);
 
     this.#rest.emit("userCreate", user);
-    this.#setUser(user);
+    this.#set(user);
     return user;
   };
 
@@ -87,22 +87,24 @@ class UsersManager {
     assert(payload.name && typeof payload.name === "string", "Payload must include name");
     payload.guildId = this.guildId;
 
-    const route = Routes.guilds.users.get(id, this.guildId);
+    const route = Routes.guilds.users.get(payload.id, this.guildId);
     const response = await this.#rest.request("PATCH", route, payload);
     const userBefore = this.#users.get(payload.id);
-    const user = new User(response, this.#rest, this.guildId);
+    const user = new User(response, this.#rest, this.guildId, this);
 
     this.#rest.emit("userUpdate", userBefore, user);
-    this.#setUser(user);
+    this.#set(user);
 
     return user;
   }
-  #setUser(user) {
-    if (this.#users.has(user.id)) this.#removeIdFromCache(user.id);
+  #set(user) {
     return this.#users.set(user.id, user);
   }
   #removeIdFromCache(id) {
     this.#users.delete(id);
+  }
+  #updateUsers(data) {
+    for (let user of data || []) this.#set(user);
   }
 };
 exports.UsersManager = UsersManager;

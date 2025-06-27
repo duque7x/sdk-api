@@ -1,17 +1,17 @@
+/* eslint-disable no-unused-private-class-members */
 const { Collection } = require("../../structures/Collection");
 const { Mediator } = require("../../structures/Mediator");
 const Routes = require("../../rest/Routes");
 const assert = require("node:assert");
-
 exports.MediatorsManager = class MediatorsManager {
   #rest;
   #mediators;
-
-  constructor(rest, guildId) {
+  constructor(data, rest) {
     this.#rest = rest;
     this.#mediators = new Collection();
-    this.guildId = guildId;
 
+    this.guildId = data?.guildId;
+    this.#updateMediators(data?.mediators);
   }
   get cache() {
     return this.#mediators;
@@ -26,8 +26,9 @@ exports.MediatorsManager = class MediatorsManager {
     const response = await this.#rest.request("POST", route, payload);
 
     for (let mediatorData of response.mediators) {
-      const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
-      this.#setMediator(mediator);
+      const mediator = new Mediator(mediatorData, this.#rest, this.guildId, this);
+      this.#set(mediator);
+
       if (mediatorData.id == payload.id) {
         this.#rest.emit("mediatorCreate", mediator);
         return mediator;
@@ -37,10 +38,9 @@ exports.MediatorsManager = class MediatorsManager {
 
   set(id, mediator) {
     assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
-    assert(mediator && mediator instanceof Mediator, `${mediator} must be an instance of Mediator`);
 
-    this.#setMediator(mediator);
-    return;
+    this.#set(mediator);
+    return mediator;
   }
 
   async fetch(id) {
@@ -48,20 +48,20 @@ exports.MediatorsManager = class MediatorsManager {
 
     const route = Routes.guilds.mediators.get(id, this.guildId);
     const response = await this.#rest.request("GET", route);
-    const mediator = new Mediator(response, this.#rest, this.guildId);
+    const mediator = new Mediator(response, this.#rest, this.guildId, this);
 
-    this.#setMediator(mediator);
+    this.#set(mediator);
     return mediator;
   };
 
   async fetchAll() {
     const route = Routes.guilds.mediators.getAll(this.guildId);
-    const response = await this.#rest.request("GET", route, payload);
+    const response = await this.#rest.request("GET", route);
 
     this.#mediators.clear();
     for (let mediatorData of response) {
-      const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
-      this.#setMediator(mediator);
+      const mediator = new Mediator(mediatorData, this.#rest, this.guildId, this);
+      this.#set(mediator);
     }
     return this.#mediators;
   };
@@ -70,15 +70,13 @@ exports.MediatorsManager = class MediatorsManager {
     assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
 
     const route = Routes.guilds.mediators.get(id, this.guildId);
-    await this.#rest.request("DELETE", route);
-
+    const response = await this.#rest.request("DELETE", route);
     this.#rest.emit("mediatorDelete", this.#mediators.get(id));
-    
+
     for (let mediatorData of response.mediators) {
-      const mediator = new Mediator(mediatorData, this.#rest, this.guildId);
-      this.#setMediator(mediator);
+      this.#set(mediatorData.id, mediatorData);
     }
-    return;
+    return this;
   };
   async removeAll() {
     const route = Routes.guilds.mediators.deleteAll(this.guildId);
@@ -90,21 +88,25 @@ exports.MediatorsManager = class MediatorsManager {
   async update(payload) {
     assert(payload && typeof payload === "object", "Payload must be an object");
 
-    const route = Routes.guilds.mediators.update(id, this.guildId);
+    const route = Routes.guilds.mediators.update(payload.id, this.guildId);
     const response = await this.#rest.request("PATCH", route);
     const medBefore = this.#mediators.get(payload.id);
-    const mediator = new Mediator(response, this.#rest, this.guildId);
+    const mediator = new Mediator(response, this.#rest, this.guildId, this);
 
     this.#rest.emit("mediatorUpdate", medBefore, mediator);
-    this.#setMediator(mediator);
+    this.#set(mediator);
 
     return mediator;
   }
-  #setMediator(mediator) {
-    if (this.#mediators.has(mediator.id)) this.#removeIdFromCache(mediator.id);
+  #set(mediator) {
+    mediator = mediator instanceof Mediator ? mediator :
+      new Mediator(mediator, this.#rest, this.guildId, this);
     return this.#mediators.set(mediator.id, mediator);
   }
   #removeIdFromCache(id) {
     this.#mediators.delete(id);
+  }
+  #updateMediators(data) {
+    for (let mediator of data || []) this.#set(mediator);
   }
 };

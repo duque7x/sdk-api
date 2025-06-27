@@ -8,17 +8,19 @@ exports.BetUser = class {
    * 
    * @param {*} data 
    */
-  constructor(data, rest, guildId) {
+  constructor(data, rest, guildId, manager) {
+    this.manager = manager;
+
     this.id = data?.id ?? "";
     this.name = data?.name ?? "";
-    this.credit = Number(data?.credit) ?? 0;
-    this.wins = Number(data?.wins) ?? 0;
-    this.mvps = Number(data?.mvps) ?? 0;
-    this.losses = Number(data?.losses) ?? 0;
+    this.credit = data?.credit ? Number(data?.credit) : 0;
+    this.wins = data?.wins ? Number(data?.wins) : 0;
+    this.mvps = data?.mvps ? Number(data?.mvps) : 0;
+    this.losses = data?.losses ? Number(data?.losses) : 0;
     this.betsPlayed = data?.betsPlayed ?? [];
     this.blacklist = data?.blacklist ?? false;
-    this.createdAt = new Date(data.createdAt) ?? new Date();
-    this.updatedAt = new Date(data.updatedAt) ?? new Date();
+    this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
+    this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
 
     this.coins = data?.coins ? Number(data?.coins) : 0;
     this.dailyWins = data?.dailyWins ?? { amount: 0, date: new Date() };
@@ -137,12 +139,12 @@ exports.BetUser = class {
         if (key == "betsPlayed") {
           finalPayload.betsPlayed = [...this.betsPlayed];
           for (let bet of payload.betsPlayed) {
-              finalPayload.betsPlayed = finalPayload.betsPlayed.filter(id => id != bet);
+            finalPayload.betsPlayed = finalPayload.betsPlayed.filter(id => id != bet);
           }
         }
       }
     }
-    
+
     const route = Routes.guilds.betUsers.update(this.id, this.guildId);
     const updatedData = await this.#rest.request("PATCH", route, finalPayload);
 
@@ -165,5 +167,10 @@ exports.BetUser = class {
       if (key == "id" || key == "_id" || key == "guildId") continue;
       if (this[key] !== undefined) this[key] = data[key];
     }
+    this.manager.set(this.id, this);
+  }
+
+  toString() {
+    return `<@${this.id}>`;
   }
 }

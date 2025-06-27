@@ -8,7 +8,9 @@ class Match {
      * 
      * @param {*} data 
      */
-    constructor(data, rest, guildId) {
+    constructor(data, rest, guildId, manager) {
+        this.manager = manager;
+
         this.type = data?.type;
         this.voiceChannels = data?.voiceChannels;
         this.status = data?.status;
@@ -21,8 +23,8 @@ class Match {
         this.confirmed = data?.confirmed;
         this.leaders = data?.leaders;
         this._id = data?._id;
-        this.createdAt = new Date(data?.createdAt);
-        this.updatedAt = new Date(data?.updatedAt);
+        this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
+        this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
         this.#data = data;
         this.#rest = rest;
 
@@ -47,7 +49,7 @@ class Match {
                 const route = Routes.guilds.matches.resource(this._id, op.toLowerCase(), this.guildId);
                 await this.#rest.request(
                     "DELETE",
-                    Routes.fields(Routes.fields(Routes.match(this._id), op.toLowerCase()))
+                    Routes.fields(Routes.fields(route, op.toLowerCase()))
                 );
                 this[op] = options[op];
             }
@@ -61,7 +63,7 @@ class Match {
         return this;
     };
     async delete() {
-        const route = Routes.guilds.matches.resource(this._id, key.toLowerCase(), this.guildId);
+        const route = Routes.guilds.matches.delete(this._id, this.guildId);
         const updatedData = await this.#rest.request("DELETE", route);
         this.#updateInternals(updatedData);
         return;
@@ -96,6 +98,10 @@ class Match {
             if (key == "id" || key == "_id" || key == "guildId") continue;
             if (this[key]) this[key] = data[key];
         }
+        this.manager.set(this._id, this);
+    }
+    toString() {
+        return `${this._id}`;
     }
 }
 

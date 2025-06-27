@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-private-class-members */
 const Routes = require("../../rest/Routes");
 const assert = require("node:assert");
 const { Collection } = require("../../structures/Collection");
@@ -16,7 +17,7 @@ exports.LogsManager = class {
         this.#baseUrl = Routes.guilds.bets.resource(this.guildId, _id, "logs");
 
         this.messages = new Collection();
-        this.#updateMessagesInternaly(data.messages);
+        this.#updateMessages(data.messages);
     }
     async addMessage(content, type, userId) {
         assert(content && typeof content === "string" || typeof content === "object", "Content must be a string");
@@ -27,10 +28,10 @@ exports.LogsManager = class {
         const route = Routes.fields(this.#baseUrl, "messages");
         const updatedData = await this.#rest.request("PATCH", route, payload);
 
-        this.#updateMessagesInternaly(updatedData.logs.messages);
+        this.#updateMessages(updatedData.logs.messages);
         return updatedData.messages;
     }
-    #updateMessagesInternaly(messages) {
+    #updateMessages(messages) {
         if (typeof messages === "object") {
             this.messages.clear();
             for (let msg of messages) {
@@ -38,9 +39,10 @@ exports.LogsManager = class {
                     content: msg.content ?? "",
                     userId: msg.userId ?? 0,
                     type: msg.type ?? "text",
-                    createdAt: new Date(msg.createdAt) ?? new Date()
+                    createdAt: msg.createdAt ? new Date(msg.createdAt) : new Date()
                 });
             }
         };
     }
+
 }

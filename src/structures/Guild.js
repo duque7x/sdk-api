@@ -1,16 +1,10 @@
 const Routes = require("../rest/Routes");
-const { Bet } = require("./Bet");
-const { Collection } = require("./Collection");
-const { Match } = require("./Match");
-const { User } = require("./User");
 const assert = require("node:assert");
 const { BetsManager } = require("../managers/bets/BetsManager");
 const { UsersManager } = require("../managers/users/UsersManager");
 const { MatchesManager } = require("../managers/matches/MatchesManager");
 const { BetUsersManager } = require("../managers/betusers/BetUsersManager");
-const { BetUser } = require("./BetUser");
 const { MediatorsManager } = require("../managers/mediators/MediatorsManager");
-const { Mediator } = require("./Mediator");
 
 class Guild {
     #rest;
@@ -31,22 +25,25 @@ class Guild {
         this.roles = data?.roles ?? {};
         this.messages = data?.messages ?? {};
         this.emojis = data?.emojis ?? {};
-        
+
         this.channels = data?.channels ?? {};;
         this.categories = data?.categories ?? {};;
 
-        this.users = new UsersManager(rest, this.id);
-        this.betUsers = new BetUsersManager(rest, this.id);
-        this.bets = new BetsManager(rest, this.id);
-        this.matches = new MatchesManager(rest, this.id);
-        this.mediators = new MediatorsManager(rest, this.id);
+        this.users = new UsersManager({ users: data.users, guildId: this.id }, rest);
+        this.betUsers = new BetUsersManager({ betUsers: data.betUsers, guildId: this.id }, rest);
+        this.bets = new BetsManager({ bets: data.bets, guildId: this.id }, rest);
+        this.matches = new MatchesManager({ matches: data.matches, guildId: this.id }, rest);
+        this.mediators = new MediatorsManager({ mediators: data.mediators, guildId: this.id }, rest);
 
         this.#rest = rest;
         this.#data = data;
 
         for (let pl of data?.blacklist ?? []) {
-            this.blacklist.push({ id: pl.id, addedBy: pl.addedBy, when: new Date(pl.when) })
+            this.blacklist.push({ id: pl.id, addedBy: pl.addedBy, when: new Date(pl.when) });
         }
+
+        this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
+        this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
     }
 
     get data() {
@@ -64,10 +61,7 @@ class Guild {
             adminId,
             value
         };
-        const updatedData = await this.#rest.request("PATCH", route, payload);
-
-        await user.setBlacklist(value);
-
+        const [updatedData] = await Promise.all([this.#rest.request("PATCH", route, payload), user.update({ blacklist: true })]);
         this.updateInternals(updatedData);
         return this;
     }
@@ -275,7 +269,7 @@ class Guild {
                     this.#rest.request("GET", Routes.fields(baseRoute, "matches")),
                     this.#rest.request("GET", Routes.fields(baseRoute, "mediators")),
                 ]);
-                this.setstuff(users, betUsers, bets, matches, mediators);
+                this.initialize(users, betUsers, bets, matches, mediators);
             } catch (err) {
                 console.error(`Erro ao atualizar dados da guilda ${this.id}:`, err);
             }
@@ -283,39 +277,39 @@ class Guild {
         setInterval(update, ONE_MINUTE);
     }
 
-    setstuff(users, betUsers, bets, matches, mediators) {
-        for (const u of users ?? []) {
-            if (!u?.id) continue;
-            const user = new User(u, this.#rest, this.id);
+    initialize(users, betUsers, bets, matches, mediators) {
+        for (const user of users ?? []) {
+            if (!user?.id) continue;
+
             this.users.set(user.id, user);
             this.#rest.users.set(user.id, user);
         }
 
-        for (const bu of betUsers ?? []) {
-            if (!bu?.id) continue;
-            const betUser = new BetUser(bu, this.#rest, this.id);
-            this.betUsers.set(betUser.id, betUser);
-            this.#rest.betUsers.set(betUser.id, betUser);
+        for (const user of betUsers ?? []) {
+            if (!user?.id) continue;
+
+            this.betUsers.set(user.id, user);
+            this.#rest.betUsers.set(user.id, user);
         }
 
-        for (const b of bets ?? []) {
-            if (!b?._id) continue;
-            const bet = new Bet(b, this.#rest, this.id);
+        for (const bet of bets ?? []) {
+            if (!bet?._id) continue;
+
             this.bets.set(bet._id, bet);
             this.#rest.bets.set(bet._id, bet);
         }
 
-        for (const m of matches ?? []) {
-            if (!m?._id) continue;
-            const match = new Match(m, this.#rest, this.id);
+        for (const match of matches ?? []) {
+            if (!match?._id) continue;
+
             this.matches.set(match._id, match);
             this.#rest.matches.set(match._id, match);
         }
 
-        for (const md of mediators ?? []) {
-            if (!md?.id) continue;
-            const mediator = new Mediator(md, this.#rest, this.id);
+        for (const mediator of mediators ?? []) {
+            if (!mediator?.id) continue;
             this.mediators.set(mediator.id, mediator);
+
         }
     }
 
@@ -327,52 +321,35 @@ class Guild {
             if (baseKeys.includes(key)) {
                 this[key] = data[key];
             }
-
             if (key === "users") {
-                this.users.cache.clear();
-                for (const u of data[key]) {
-                    if (!u?.id) continue;
-                    const user = new User(u, this.#rest, this.id);
-                    this.users.set(user.id, user);
-                }
+                const users = data.users;
+                this.initialize(users);
             }
 
             if (key === "betUsers") {
-                this.betUsers.cache.clear();
-                for (const u of data[key]) {
-                    if (!u?.id) continue;
-                    const betUser = new BetUser(u, this.#rest, this.id);
-                    this.betUsers.set(betUser.id, betUser);
-                }
+                const betUsers = data.betUsers;
+                this.initialize([], betUsers);
             }
 
             if (key === "bets") {
-                this.bets.cache.clear();
-                for (const b of data[key]) {
-                    if (!b?._id) continue;
-                    const bet = new Bet(b, this.#rest, this.id);
-                    this.bets.set(bet._id, bet);
-                }
+                const bets = data.bets;
+                this.initialize([], [], bets);
+
             }
 
             if (key === "matches") {
-                this.matches.cache.clear();
-                for (const m of data[key]) {
-                    if (!m?._id) continue;
-                    const match = new Match(m, this.#rest, this.id);
-                    this.matches.set(match._id, match);
-                }
+                const matches = data.matches;
+                this.initialize([], [], [], matches);
             }
 
             if (key === "mediators") {
-                this.mediators.cache.clear();
-                for (const md of data[key]) {
-                    if (!md?.id) continue;
-                    const mediator = new Mediator(md, this.#rest, this.id);
-                    this.mediators.set(mediator.id, mediator);
-                }
+                const mediators = data.mediators;
+                this.initialize([], [], [], [], mediators);
             }
         }
+    }
+    toString() {
+        return `${this._id}`;
     }
 }
 

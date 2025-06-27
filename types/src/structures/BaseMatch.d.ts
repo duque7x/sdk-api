@@ -37,4 +37,6 @@ export class BaseMatch {
 
     createdAt: Date;
     updatedAt: Date;
+
+    toString(): string;
 }

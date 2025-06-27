@@ -7,7 +7,6 @@ class Collection extends Map {
         if (index < 0 || index >= this.size) {
             return undefined;
         }
-
         let i = 0;
         for (let [key, value] of this) {
             if (i === index) {
@@ -53,6 +52,9 @@ class Collection extends Map {
         });
 
         return new Collection(sortedEntries);
+    }
+    toString() {
+        return `${this.size}`;
     }
 }
 

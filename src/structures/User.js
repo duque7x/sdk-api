@@ -8,7 +8,9 @@ class User {
    * 
    * @param {*} data 
    */
-  constructor(data, rest, guildId) {
+  constructor(data, rest, guildId, manager) {
+    this.manager = manager;
+
     this.id = data.id;
     this.name = data.name;
     this.points = data.points;
@@ -19,8 +21,8 @@ class User {
     this.blacklist = data.blacklist;
     this.protections = data.protections;
     this.originalChannels = data.originalChannels;
-    this.createdAt = new Date(data.createdAt);
-    this.updatedAt = new Date(data.updatedAt);
+    this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
+    this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
     this.#rest = rest;
     this.#data = data;
 
@@ -41,16 +43,12 @@ class User {
         originalChannels: [],
         blacklist: { blacklisted: false },
       };
-
-      for (let op in options) {
-        const route = Routes.guilds.users.resource(this.id, op.toLowerCase(), this.guildId);
-        await this.#rest.request("DELETE", route);
-        this[op] = options[op];
-      }
+      const route = Routes.guilds.users.resource(this.id, this.guildId);
+      const updatedData = await this.#rest.request("PATCH", route, options);
+      this.#updateInternals(updatedData);
       return this;
     }
     if (typeof key !== "string") throw new Error("key must be a string");
-    this.#verifyField(key);
     const route = Routes.guilds.users.resource(this.id, key.toLowerCase(), this.guildId);
     const updatedData = await this.#rest.request("DELETE", route);
     this.#updateInternals(updatedData);
@@ -59,12 +57,13 @@ class User {
   };
   async delete() {
     const route = Routes.guilds.users.delete(this.id, this.guildId);
-    const updatedData = await this.#rest.request("delete", route);
+    await this.#rest.request("delete", route);
     return;
-
   };
   async add(field, amount = 1) {
-    this.#verifyField(field);
+    assert(field && typeof field == "string", "Field must be a string");
+    assert(amount, "Amount must be present");
+
     const route = Routes.guilds.users.resource(this.id, field, this.guildId);
     const updatedData = await this.#rest.request("PATCH", route, { [field]: amount });
 
@@ -72,7 +71,9 @@ class User {
     return this[field];
   };
   async remove(field, amount = 1) {
-    this.#verifyField(field);
+    assert(field && typeof field == "string", "Field must be a string");
+    assert(amount, "Amount must be present");
+
     const route = Routes.guilds.users.resource(this.id, field, this.guildId);
     const updatedData = await this.#rest.request("PATCH", route, { [field]: -amount });
 
@@ -80,29 +81,25 @@ class User {
     return this;
   };
   async set(key, value) {
-    if (typeof key !== "string") throw new Error("key must be a string");
-    this.#verifyField(key);
-    const route = Routes.guilds.users.resource(this.id, field, this.guildId);
+    assert(key && typeof key == "string", "Key must be a string");
+    assert(value, "Value must be present");
+
+    const route = Routes.guilds.users.resource(this.id, key, this.guildId);
     const updatedData = await this.#rest.request("PATCH", route, { set: value });
     this.#updateInternals(updatedData);
     return this;
   };
-  #validFields = [
-    "wins",
-    "points",
-    "losses",
-    "mvps",
-    "gamesPlayed",
-    "blacklisted",
-  ];
-  #verifyField(field) {
-    if (!this.#validFields.includes(field)) throw new Error(`Invalid field "${field}" for update`);
-  }
+
   #updateInternals(data) {
     for (let key in data) {
       if (key == "id" || key == "_id" || key == "guildId") continue;
       if (this[key]) this[key] = data[key];
     }
+
+    this.manager.set(data.id, data);
+  }
+  toString() {
+    return `<@${this.id}>`;
   }
 }
 

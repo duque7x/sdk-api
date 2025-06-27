@@ -35,4 +35,6 @@ export class BaseUser {
 
   createdAt: Date;
   updatedAt: Date;
+
+  toString(): string;
 }

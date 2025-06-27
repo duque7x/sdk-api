@@ -26,12 +26,10 @@ exports.GuildsManager = class GuildsManager {
 
     async fetch(id) {
         assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
-
         const route = Routes.guilds.get(id);
         const response = await this.#rest.request("GET", route);
 
         const guild = new Guild(response, this.#rest);
-        guild.setstuff(response.users, response.betUsers, response.bets, response.matches, response.mediators);
 
         this.set(guild.id, guild);
         return guild;
@@ -95,12 +93,9 @@ exports.GuildsManager = class GuildsManager {
             const guilds = await this.#rest.request("GET", route);
             if (!guilds || guilds.error) return new Collection();
 
-            this.#guilds.clear();
             for (const guildData of guilds) {
                 if (!guildData.id) continue;
-
                 const guild = new Guild(guildData, this.#rest);
-                guild.setstuff(guildData.users, guildData.betUsers, guildData.bets, guildData.matches, guildData.mediators);
                 this.set(guild.id, guild);
             }
         };

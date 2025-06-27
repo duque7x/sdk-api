@@ -4,12 +4,14 @@ const assert = require('node:assert');
 exports.Mediator = class {
     #rest;
     #data;
-    constructor(data, rest, guildId) {
+    constructor(data, rest, guildId, manager) {
+        this.manager = manager;
+        
         this.id = data?.id;
         this.name = data?.name;
         this.paymentLinks = data.paymentLinks;
-        this.createdAt = new Date(data.createdAt);
-        this.updatedAt = new Date(data.updatedAt);
+        this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
+        this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
 
         this.#rest = rest;
         this.#data = data;
@@ -28,7 +30,7 @@ exports.Mediator = class {
         assert(link && typeof link === "string", "Link must be a string");
 
         const route = Routes.guilds.mediators.resource(this.guildId, this.id, "links");
-        const payload = { paymentLinks: [link] };
+        const payload = { paymentLinks: [link], set: true };
         const updatedData = await this.#rest.request("PATCH", route, payload);
 
         this.#updateInternals(updatedData);
@@ -49,5 +51,10 @@ exports.Mediator = class {
             if (key == "id" || key == "_id" || key == "guildId") continue;
             if (this[key]) this[key] = data[key];
         }
+
+        this.manager.set(data.id, data);
+    }
+    toString() {
+        return `<@${this.id}>`;
     }
 }

@@ -11,45 +11,34 @@ exports.BetsManager = class BetsManager {
      * @param {import("../../../types/src/rest/REST").REST} rest 
      * @param {string} guildId 
      */
-    constructor(rest, guildId) {
+    constructor(data, rest) {
         this.#rest = rest;
         this.#bets = new Collection();
-        this.guildId = guildId;
+
+        this.guildId = data?.guildId;
+        this.#updateBets(data?.bets);
     }
     get cache() {
         return this.#bets;
     }
-
     set(id, bet) {
         assert(id && typeof id === "string", `${id} must be a string or a Discord Snowflake`);
-        assert(bet && bet instanceof Bet, `${bet} must be an instance of Bet`);
-
-        this.#setBet(bet);
-        return bet;
+        return this.#set(bet);
     }
     async fetch(id) {
         assert(id && typeof id === "string", `${id} must be a string or a Mongoose Object Id`);
 
         const route = Routes.guilds.bets.get(id, this.guildId);
         const payload = { guildId: this.guildId };
-        const response = await this.#rest.request("GET", route, payload);
-        if (response) {
-            const bet = new Bet(response, this.#rest, this.guildId);
-            this.#setBet(bet);
-            return bet;
-        }
-        return null;
+        const response = await this.#rest.request("GET", route, payload)
+        return this.#set(response);
     };
     async fetchAll() {
         const route = Routes.guilds.bets.getAll(this.guildId);
-        const payload = { guildId: this.guildId };
-        const response = await this.#rest.request("GET", route, payload);
-
-        await this.#bets.clear();
+        const response = await this.#rest.request("GET", route);
 
         for (let betData of response) {
-            const bet = new Bet(betData, this.#rest, this.guildId);
-            this.#setBet(bet);
+            this.#set(betData);
         }
         return this.#bets;
     };
@@ -61,12 +50,9 @@ exports.BetsManager = class BetsManager {
 
         const route = Routes.guilds.bets.create(this.guildId);
         const response = await this.#rest.request('POST', route, payload);
-        const bet = new Bet(response, this.#rest, this.guildId);
+        const bet = this.#set(response);
 
         this.#rest.emit("betCreate", bet);
-        this.#setBet(bet);
-        console.log({ bet });
-        
         return bet;
     }
     async delete(id) {
@@ -75,9 +61,9 @@ exports.BetsManager = class BetsManager {
         const route = Routes.guilds.bets.delete(id, this.guildId);
         const bet = this.#bets.get(id);
         this.#rest.emit("betDelete", bet);
-
         await this.#rest.request("DELETE", route, { guildId: this.guildId });
-        this.#removeIdFromCache(id);
+
+        this.#remove(id);
         return;
     };
     async deleteAll() {
@@ -87,11 +73,16 @@ exports.BetsManager = class BetsManager {
         this.#bets.clear();
         return;
     };
-    #removeIdFromCache(id) {
+    #remove(id) {
         this.#bets.delete(id);
     }
-    #setBet(bet) {
-        if (this.#bets.has(bet._id)) this.#removeIdFromCache(bet._id);
-        return this.#bets.set(bet._id, bet);
+    #set(bet) {
+        bet = bet instanceof Bet ? bet : new Bet(bet, this.#rest, this.guildId, this);
+        this.#bets.set(bet._id, bet);
+        this.#rest.bets.set(bet._id, bet);
+        return bet;
+    }
+    #updateBets(data) {
+        for (let bet of data ?? []) this.#set(bet);
     }
 }

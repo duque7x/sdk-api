@@ -3,19 +3,20 @@ const { BetUser } = require("../../structures/BetUser");
 const Routes = require("../../rest/Routes");
 const assert = require('node:assert');
 
-class BetUsersManager {
+exports.BetUsersManager = class {
   #rest;
   #betUsers;
   /**
-     * 
-     * @param {import("../../../types/src/rest/REST").REST} rest 
-     * @param {string} guildId 
-     */
-  constructor(rest, guildId) {
+    * 
+    * @param {import("../../../types/src/rest/REST").REST} rest 
+    * @param {string} guildId 
+    */
+  constructor(data, rest) {
     this.#rest = rest;
     this.#betUsers = new Collection();
 
-    this.guildId = guildId;
+    this.guildId = data?.guildId;
+    this.#updateUsers(data?.betUsers);
   }
 
   get cache() {
@@ -24,10 +25,9 @@ class BetUsersManager {
 
   set(id, user) {
     assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
-    assert(user, `${user} must be an instance of BetUser`);
-
-    return this.#setUserAndUpdateGuild(user);
+    return this.#set(user);
   }
+
   async reset(id, name) {
     assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
     assert(name && typeof name === "string", `${name} must be a string`);
@@ -36,17 +36,14 @@ class BetUsersManager {
     const payload = { id, name, reset: true };
     const response = await this.#rest.request("DELETE", route, payload);
 
-    const user = new BetUser(response.betUsers.find(u => u.id == id), this.#rest, this.guildId);
-
-    this.#setUserAndUpdateGuild(response);
+    const user = this.#set(response.betUsers.find(u => u.id == id));
     return user;
   }
   async resetAll() {
     const route = Routes.guilds.resource("betusers", this.guildId);
     const response = await this.#rest.request("PUT", route);
 
-    this.#setUserAndUpdateGuild(response);
-    return void 0;
+    this.#set(response);
   }
   async fetch(id, name) {
     assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
@@ -56,21 +53,16 @@ class BetUsersManager {
     const payload = { id, name };
     const response = await this.#rest.request("GET", route, payload);
 
-    const user = new BetUser(response, this.#rest, this.guildId);
-
-    this.#setUserAndUpdateGuild(user);
+    const user = this.#set(response);
     return user;
   }
 
   async fetchAll() {
     const route = Routes.guilds.betUsers.getAll(this.guildId);
-    const payload = { guildId: this.guildId };
-    const response = await this.#rest.request("GET", route, payload);
+    const response = await this.#rest.request("GET", route);
 
-    this.#betUsers.clear();
     for (let userData of response) {
-      const user = new BetUser(userData, this.#rest, this.guildId);
-      this.#setUserAndUpdateGuild(user);
+      this.#set(userData);
     }
     return this.#betUsers;
   }
@@ -82,9 +74,8 @@ class BetUsersManager {
 
     const route = Routes.guilds.betUsers.create(this.guildId);  // Use correct route
     const response = await this.#rest.request("POST", route, payload);
-    const user = new BetUser(response, this.#rest, this.guildId);
+    const user = this.#set(response);
 
-    this.#setUserAndUpdateGuild(user);
     this.#rest.emit("betUserCreate", user);
     return user;
   }
@@ -98,11 +89,9 @@ class BetUsersManager {
     const route = Routes.guilds.betUsers.update(payload.id, this.guildId);  // Use correct route
     const response = await this.#rest.request("PATCH", route, payload);
     const userBefore = this.#betUsers.get(payload.id);
-    const user = new BetUser(response, this.#rest, this.guildId);
+    const user = this.#set(response);
 
     this.#rest.emit("betUserUpdate", userBefore, user);
-    this.#setUserAndUpdateGuild(user);
-
     return user;
   }
 
@@ -127,10 +116,13 @@ class BetUsersManager {
   #removeIdFromCache(id) {
     this.#betUsers.delete(id);
   }
-  #setUserAndUpdateGuild(data) {
-    if (this.#betUsers.get(data.id)) this.#removeIdFromCache(data.id);
-    return this.#betUsers.set(data.id, data);
+  #set(user) {
+    user = user instanceof BetUser ? user : new BetUser(user, this.#rest, this.guildId, this);
+    this.cache.set(user.id, user);
+    this.#rest.betUsers.set(user.id, user);
+    return user;
+  }
+  #updateUsers(data) {
+    for (let user of data ?? []) this.#set(user);
   }
 }
-
-exports.BetUsersManager = BetUsersManager;
