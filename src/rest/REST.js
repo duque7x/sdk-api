@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
 require("dotenv").config();
 const { GuildsManager } = require("../managers/guilds/GuildsManager");
+const assert = require("node:assert");
 const Routes = require("../rest/Routes");
 const { request, Headers } = require('undici');
 const { EventEmitter } = require("node:events");
@@ -20,12 +22,17 @@ exports.REST = class extends EventEmitter {
 
     this.#clientKey = clientKey;
   }
-
+  setClientKey(key) {
+    assert(key && typeof key === "string", "Client key must be a string!");
+    this.#clientKey = key;
+    return this;
+  }
   async init() {
     await this.guilds.cacheGuilds();
   }
 
   async request(method, path, data) {
+    if (!this.#clientKey) throw new Error("Client Key was not given.")
     return await this.#requester(method, Routes.base + path, data);
   }
 
@@ -34,6 +41,8 @@ exports.REST = class extends EventEmitter {
     return data;
   };
  async doShit(method, url, dataToSend) {
+  console.log({ url });
+  
     method = method.toUpperCase();
     
     const makeRequest = async (clientKey) => {

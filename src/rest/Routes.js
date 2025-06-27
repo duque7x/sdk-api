@@ -1,6 +1,7 @@
 module.exports = {
-    //base: "https://duquedev.up.railway.app/api/v1",
-   base: "http://localhost:3000/api/v1",
+    base: "https://duquedev.up.railway.app/api/v1",
+
+    //base: "http://localhost:3000/api/v1",
 
     field: field => `/${field}`,
     fields: (...field) => field.join("/"),
@@ -71,7 +72,7 @@ module.exports = {
             update: (betId, guildId) => `/guilds/${guildId}/bets/${betId}`,
 
             delete: (betId, guildId) => `/guilds/${guildId}/bets/${betId}`,
-            deleteAll: (guildId) => `/guilds/${guildId}/bets/${betId}`,
+            deleteAll: (guildId) => `/guilds/${guildId}/bets/`,
 
             resource: (guildId, ...args) => `/guilds/${guildId}/bets/${args.join("/")}`,
         },

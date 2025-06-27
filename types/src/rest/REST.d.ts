@@ -41,4 +41,11 @@ export declare class REST extends EventEmitter {
     on<K extends keyof EventMap>(eventName: K, listener: (args: EventMap[K]) => void): this;
     on(eventName: "userCreate", listener: (args: User) => void): this;
     on(eventName: "guildUpdate", listener: (args: Guild) => void): this;
+
+    /**
+     * 
+     * @param key This is the key that allows customers to have acess to the bots!
+     * Can not be bypassed by anyone
+     */
+    setClientKey(key: string): REST;
 }
