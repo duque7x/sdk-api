@@ -26,10 +26,24 @@ client.init().then(async () => {
   // Reseting users
   client.users.resetAll();
   // Or
-  client.betUsers.resetAll(0);
+  client.betUsers.resetAll();
 });
 ```
+## Update 2.1.0
+### Shop is now available. How to use?
+```js
+client.init().then(async (_) => {
+  const guild = client.guilds.cache.get("1336809872884371587");
 
+  const shop = guild?.shop;
+  const products = await shop.products.fetchAll();
+  const product = await shop.products.create({ name: "Duque", description: "The duque is the one", price: 20 });
+
+  await product.addBuyer("877598927149490186", "duque7x", "bet");
+  await product.update({ description: "Netflix por 10€", name: "Duque ain't the one", price: 100 });
+
+});
+```
 ## NPM package
 You can find the link [here](https://www.npmjs.com/package/@duque.edits/rest).
 

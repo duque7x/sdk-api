@@ -23,9 +23,10 @@ class User {
     this.originalChannels = data.originalChannels;
     this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
     this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
+    this.items = data?.items ?? [];
+
     this.#rest = rest;
     this.#data = data;
-
     this.guildId = guildId;
   }
   toString() {

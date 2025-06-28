@@ -75,5 +75,24 @@ module.exports = {
 
             resource: (guildId, ...args) => `/guilds/${guildId}/bets/${args.join("/")}`,
         },
+        shop: {
+            products: {
+                get: (productId, guildId) => `/guilds/${guildId}/shop/products/${productId}`,
+                getAll: guildId => `/guilds/${guildId}/shop/products`,
+
+                create: (guildId) => `/guilds/${guildId}/shop/products/`,
+                update: (productId, guildId) => `/guilds/${guildId}/shop/products/${productId}`,
+
+                delete: (productId, guildId) => `/guilds/${guildId}/shop/products/${productId}`,
+                deleteAll: (guildId) => `/guilds/${guildId}/shop/products`,
+
+                resource: (productId, guildId, ...args) => `/guilds/${guildId}/shop/products/${productId}/${args.join("/")}`,
+            },
+            update: guildId => `/guilds/${guildId}/shop`,
+            set: guildId => `/guilds/${guildId}/shop`,
+
+            delete: (guildId) => `/guilds/${guildId}/shop`,
+            resource: (guildId, ...args) => `/guilds/${guildId}/shop/${args.join("/")}`,
+        },
     }
 }

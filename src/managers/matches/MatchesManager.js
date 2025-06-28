@@ -14,8 +14,6 @@ exports.MatchesManager = class {
 
     this.guildId = data?.guildId;
     this.#updateMatches(data?.matches);
-
-    console.log({ guildiD: this.guildId, matchesINMANAGER: this.cache.toArray().slice(0, 2) });
   }
   get cache() {
     return this.#matches;

@@ -40,35 +40,34 @@ exports.REST = class extends EventEmitter {
     const { data } = await this.doShit(method, url, sendData);
     return data;
   };
- async doShit(method, url, dataToSend) {
-  console.log({ url });
-  
+  async doShit(method, url, dataToSend) {
+    console.log({ url });
     method = method.toUpperCase();
-    
+
     const makeRequest = async (clientKey) => {
       const headers = new Headers();
       headers.append("duque-auth", process.env.AUTH);
       headers.append("Content-Type", "application/json");
       headers.append("duque-client-key", clientKey);
-      
+
       const res = await request(url, {
         method,
         headers,
         body: dataToSend !== undefined ? JSON.stringify(dataToSend) : undefined,
       });
-  
+
       const body = await res.body.json();
       const { data, message } = body;
-  
+
       if (message) console.log({ message });
       return { data, message };
     };
-  
+
     try {
       return await makeRequest(this.#clientKey);
     } catch (error) {
       console.error("Initial request failed:", error.message || error);
-  
+
       let tries = 0;
       while (tries < 3) {
         tries++;
@@ -79,7 +78,7 @@ exports.REST = class extends EventEmitter {
           console.error(`Retry #${tries} failed:`, err.message || err);
         }
       }
-  
+
       throw new Error("All retries failed after 5 attempts");
     }
   }

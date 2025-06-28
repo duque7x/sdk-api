@@ -98,7 +98,7 @@ exports.GuildsManager = class {
                 this.set(guildData.id, guildData);
             }
         };
-        requestGuilds().catch(console.error);
+        await requestGuilds().catch(console.error);
         setInterval(() => requestGuilds().catch(console.error), ONE_MINUTE);
         return this.#guilds;
     }

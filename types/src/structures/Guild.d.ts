@@ -5,7 +5,7 @@ import { BetUsersManager } from "../managers/BetUsersManager";
 import { REST } from "../rest/REST";
 import { MediatorsManager } from "../managers/MediatorsManager";
 import { BlackListed, Emoji, GroupedChannel, GuildData, GUILDSTATUS, NormalGuildKeys, NormalMessage, Role } from "../../..";
-
+import { Shop } from "./Shop";
 
 export class Guild {
     blacklist: BlackListed[];
@@ -33,6 +33,11 @@ export class Guild {
     bets: BetsManager;
     matches: MatchesManager;
     mediators: MediatorsManager;
+    
+    /**
+     * This the guild shop with products
+     */
+    shop: Shop;
 
     constructor(data: GuildData, rest: REST);
 

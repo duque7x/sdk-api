@@ -33,11 +33,6 @@ exports.ChannelManager = class {
 
     const route = this.baseUrl;
     const response = await this.#rest.request("PATCH", route, { set: channels });
-    console.log({
-      response,
-      route,
-      channels
-    });
 
     this.#channels.clear();
     for (let channelData of response) {

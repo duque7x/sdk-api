@@ -27,11 +27,6 @@ export class BaseMatch {
     status: STATES;
 
     /**
-     * The winners of the match
-     */
-    winners: string;
-
-    /**
      * The maximum size of players in a match
      */
     maximumSize: number;

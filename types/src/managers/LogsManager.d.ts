@@ -8,7 +8,7 @@ export type Messages = Collection<string, LogMessage>;
 interface LogData {
     messages: Messages;
 }
-type AllowedTypes = '.png' | '.jpg' | '.jpeg' | '.gif' | '.webp' | 'txt';
+type AllowedTypes = '.png' | '.jpg' | '.jpeg' | '.gif' | '.webp' | 'text';
 
 export declare class LogsManager {
     /**
@@ -30,5 +30,5 @@ export declare class LogsManager {
      * @param extension If message is an image extension is needed
      * @default extension="txt"
      */
-    addMessage(content: Buffer<any>, userId: string, type?: AllowedTypes): Promise<Messages>;
+    addMessage(content: Buffer<any> | string, userId: string, type?: AllowedTypes): Promise<Messages>;
 }

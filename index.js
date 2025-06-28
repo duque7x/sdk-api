@@ -3,7 +3,8 @@ const { ChannelManager } = require("./src/managers/channel/ChannelManager");
 const { UsersManager } = require("./src/managers/users/UsersManager");
 const { BetsManager } = require("./src/managers/bets/BetsManager");
 const { MatchesManager } = require("./src/managers/matches/MatchesManager");
-const { GuildsManager } = require("./types/src/managers/GuildsManager");
+const { MediatorsManager } = require("./src/managers/mediators/MediatorsManager");
+const { GuildsManager } = require("./src/managers/guilds/GuildsManager");
 
 const { User } = require("./src/structures/User");
 const { REST } = require("./src/rest/REST");
@@ -14,7 +15,10 @@ const { BetUser } = require("./src/structures/BetUser");
 const { Collection } = require("./src/structures/Collection");
 const { Mediator } = require("./src/structures/Mediator");
 const { Channel } = require("./src/structures/Channel");
-const { MediatorsManager } = require("./src/managers/mediators/MediatorsManager");
+const { Product } = require("./src/structures/Product");
+const { ProductsManager } = require("./src/managers/products/ProductsManager");
+const { Shop } = require("./src/structures/Shop");
+
 
 const STATES = {
   ON: "on",
@@ -69,6 +73,13 @@ const UserProtection = {
   addedBy: '',
   when: Date,
 };
+/**
+ * Represents a role within the guild.
+ */
+const Role = {
+  ids: [''],
+  type: '',
+}
 
 /**
  * Represents an association between a user and the original match channel.
@@ -160,6 +171,16 @@ const NormalMessage = {
   id: '',
   type: '',
 };
+
+
+/**
+ * Represents the tracking of a player's daily wins,
+ * with date information.
+ */
+const DailyWins = {
+  amount: 0,
+  date: Date,
+}
 
 /**
  * Defines the full data shape for a bet user,
@@ -257,13 +278,7 @@ const Emoji = {
   animated: false,
 }
 
-/**
- * Represents a role within the guild.
- */
-const Role = {
-  ids: [''],
-  type: '',
-}
+
 
 /**
  * Defines the database-stored structure of a guild.
@@ -287,15 +302,6 @@ const GuildData = {
 const BasicChannelData = {
   id: '',
   type: '',
-}
-
-/**
- * Represents the tracking of a player's daily wins,
- * with date information.
- */
-const DailyWins = {
-  amount: 0,
-  date: Date,
 }
 
 /**
@@ -383,7 +389,43 @@ const LogMessage = {
   updatedAt: Date,
 }
 
+const ProductData  = {
+  /**
+   * The name of the product
+   */
+  name: '',
 
+  /**
+  * Brief description of the product
+  */
+  description: '',
+
+  /**
+  * The product id
+  */
+  id: '',
+
+  /**
+   * The price of the product
+   */
+  price: 0,
+
+  /**
+   * THe buyers of the product
+   */
+  buyers: [Player]
+}
+const ShopData  = {
+  /**
+   * An array of products within a guild
+   */
+  products: [ProductData],
+
+  /**
+   * Number of players that bought a products this does not decrease
+   */
+  boughtCount: 0
+}
 
 exports.UsersManager = UsersManager;
 exports.GuildsManager = GuildsManager;
@@ -402,6 +444,9 @@ exports.Guild = Guild;
 exports.Match = Match;
 exports.User = User;
 exports.BetUser = BetUser;
+exports.Product = Product;
+exports.ProductsManager = ProductsManager;
+exports.Shop = Shop;
 
 exports.UserProtection = UserProtection;
 exports.BaseUserNumericFields = BaseUserNumericFields;
@@ -419,6 +464,8 @@ exports.MediatorData = MediatorData;
 exports.ChannelInfo = ChannelInfo;
 exports.BetData = BetData;
 exports.LogMessage = LogMessage;
+exports.ProductData = ProductData;
+exports.ShopData = ShopData;
 
 exports.STATES = STATES;
 exports.BASESTATUS = BASESTATUS;

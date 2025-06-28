@@ -21,6 +21,7 @@ exports.BetUser = class {
     this.blacklist = data?.blacklist ?? false;
     this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
     this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
+    this.items = data?.items ?? [];
 
     this.coins = data?.coins ? Number(data?.coins) : 0;
     this.dailyWins = data?.dailyWins ?? { amount: 0, date: new Date() };

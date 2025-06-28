@@ -464,10 +464,54 @@ export declare const Routes: {
   };
 };
 
+export interface ProductData {
+  /**
+   * The name of the product
+   */
+  name: string;
+
+  /**
+   * This is the product's emoji
+   */
+  emoji: string;
+
+  /**
+  * Brief description of the product
+  */
+  description: string;
+
+  /**
+  * The product id
+  */
+  id: string;
+
+  /**
+   * The price of the product
+   */
+  price: number;
+
+  /**
+   * THe buyers of the product
+   */
+  buyers: Player[];
+}
+export interface ShopData {
+  /**
+   * An array of products within a guild
+   */
+  products: ProductData[];
+
+  /**
+   * Number of players that bought a products this does not decrease
+   */
+  boughtCount: number;
+}
+
 export * from "./types/src/managers/UserManager";
 export * from "./types/src/managers/MatchesManager";
 export * from "./types/src/managers/BetsManager";
 export * from "./types/src/managers/BetUsersManager";
+export * from "./types/src/managers/ProductsManager";
 
 export * from "./types/src/structures/User";
 export * from "./types/src/structures/BetUser";
@@ -475,6 +519,10 @@ export * from "./types/src/structures/Guild";
 export * from "./types/src/structures/Match";
 export * from "./types/src/structures/Bet";
 export * from "./types/src/structures/Collection";
+export * from "./types/src/structures/Channel";
+export * from "./types/src/structures/Shop";
+export * from "./types/src/structures/Product";
+export * from "./types/src/rest/REST";
 export * from "./types/src/rest/REST";
 
 export * from "./types/src/payloads/BetCreatePayload";

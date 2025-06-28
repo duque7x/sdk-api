@@ -13,6 +13,16 @@ export declare class Bet extends BaseMatch {
     price: number;
 
     /**
+     * The winner of the match
+     */
+    winner: string;
+
+     /**
+     * The winner of the match
+     */
+     loser: string;
+
+    /**
      * Who has payed the bet
      */
     payedBy: string;
@@ -38,24 +48,24 @@ export declare class Bet extends BaseMatch {
     channels: ChannelManager;
 
     /**
-     * An array of messages of the bet
-     */
-    messages: NormalMessage[];
-
-    /**
-     * The id of the embed message of the bet
-     */
-    embedMessageId: string;
-
-    /**
-     * The _id of the bet
-     */
-    _id: string;
-
-    /**
-     * The mode of the bet
-     */
-    mode: string;
+     * An array of messages of the bet    
+     */   
+    messages: NormalMessage[];    
+    
+    /**   
+     * The id of the embed message of the bet   
+     */   
+    embedMessageId: string;   
+    
+    /**   
+     * The _id of the bet   
+     */   
+    _id: string;    
+    
+    /**   
+     * The mode of the bet    
+     */   
+    mode: string;   
 
     /**
      * The manager of logs in a given bet

@@ -39,6 +39,16 @@ export declare class Match extends BaseMatch {
     /** Players marked as MVP (Most Valuable Player) */
     mvpId: string;
 
+    /**
+     * The winners of the match
+     */
+    winners: string;
+
+    
+    /**
+     * The winners of the match
+     */
+    losers: string;
     addPlayer(id: string, name: string): Promise<Match>;
     removePlayer(id: string): Promise<Match>;
 

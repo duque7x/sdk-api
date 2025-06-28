@@ -5,6 +5,7 @@ const { UsersManager } = require("../managers/users/UsersManager");
 const { MatchesManager } = require("../managers/matches/MatchesManager");
 const { BetUsersManager } = require("../managers/betusers/BetUsersManager");
 const { MediatorsManager } = require("../managers/mediators/MediatorsManager");
+const { Shop } = require("./Shop");
 
 class Guild {
     #rest;
@@ -41,6 +42,12 @@ class Guild {
         for (let pl of data?.blacklist ?? []) {
             this.blacklist.push({ id: pl.id, addedBy: pl.addedBy, when: new Date(pl.when) });
         }
+        let shopData = {
+            guild: this,
+            shop: data.shop,
+        }
+        
+        this.shop = new Shop(shopData, rest);
 
         this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
         this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
