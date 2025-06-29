@@ -18,7 +18,8 @@ exports.Shop = class {
 
         let productsData = {
             products: data?.shop?.products,
-            guildId: this.guildId
+            guildId: this.guildId,
+            guild: this.guild,
         }
         this.products = new ProductsManager(productsData, rest);
         this.boughtCount = data?.shop.boughtCount;
