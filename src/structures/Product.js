@@ -65,9 +65,14 @@ exports.Product = class {
         const route = Routes.guilds.shop.products.resource(this.id, this.guildId, "buyers");
         const response = await this.#rest.request("POST", route, payload);
 
+        let user;
+        if (type == "bet") user = this.manager.guild.betUsers.cache.get(id);
+        else if (type == "match") user = this.manager.guild.users.cache.get(id);
+        user.items = [...new Set([...user.items, this.id])];
+
         this.#updateInternals(response);
         return this;
-    }   
+    }
     async removeBuyer(id, name, type) {
         assert(id && typeof id == "string", "Id must be a number");
         assert(name && typeof name == "string", "Name must be a number");
@@ -77,12 +82,17 @@ exports.Product = class {
         const route = Routes.guilds.shop.products.resource(this.id, this.guildId, "buyers", id);
         const response = await this.#rest.request("DELETE", route, payload);
 
+        let user;
+        if (type == "bet") user = this.manager.guild.betUsers.cache.get(id);
+        else if (type == "match") user = this.manager.guild.users.cache.get(id);
+        user.items = [...new Set(user.items.filter(item => item != this.id))];
+
         this.#updateInternals(response);
         return this;
-    }   
-    async delete() {
+    }
+    async delete(type) {
         const route = Routes.guilds.shop.products.delete(this.id, this.guildId);
-        const value = await this.#rest.request("DELETE", route);
+        const value = await this.#rest.request("DELETE", route, { type });
         return value;
     };
 

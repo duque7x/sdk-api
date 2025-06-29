@@ -16,6 +16,8 @@ exports.ProductsManager = class {
         this.updatedAt = data?.products?.updatedAt ? new Date(data?.products?.updatedAt) : new Date();
 
         this.guildId = data?.guildId;
+        this.guild = data.guild;
+
         this.#rest = rest;
         this.#products = new Collection();
 
@@ -57,16 +59,16 @@ exports.ProductsManager = class {
         this.#rest.emit("productCreate", product);
         return product;
     }
-    async delete(id) {
+    async delete(id, type) {
         assert(id && typeof id === "string", "Id must be a Mongoose Object Id");
 
         const route = Routes.guilds.shop.products.delete(id, this.guildId);
         const product = this.#products.get(id);
         this.#rest.emit("productDelete", product);
-        await this.#rest.request("DELETE", route, { guildId: this.guildId });
+        await this.#rest.request("DELETE", route, { type });
 
         this.#remove(id);
-        return;
+        return this.#products;
     };
     async deleteAll() {
         const route = Routes.guilds.shop.products.deleteAll(this.guildId);

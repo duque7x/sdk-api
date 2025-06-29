@@ -47,7 +47,7 @@ export class ProductsManager {
    * Deletes a product with the given id
    * @param id The product's id to delete
    */
-  delete(id: string): Promise<void>;
+  delete(id: string, type: "bet" | "match"): Promise<void>;
 
   /**
    * Deletes all product in a guild
