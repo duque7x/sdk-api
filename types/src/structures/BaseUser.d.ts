@@ -43,4 +43,6 @@ export class BaseUser {
        * Returns a string representation of this structure
        */
   toString(): string;
+
+  items: Number[];
 }

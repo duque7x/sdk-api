@@ -15,6 +15,8 @@ export class BetUser extends BaseUser {
       allowed: number[];
     };
   }
+  
+
   constructor(data: BetUserData, rest: REST, guildId: string);
 
   get data(): BetUserData;
