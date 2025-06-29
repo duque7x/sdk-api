@@ -189,7 +189,8 @@ class Guild {
     async setStatus(key, status) {
         assert(typeof key == "string", "Key must be a string");
         assert(typeof status == "string", "Status must be a string");
-
+        status = status.toLowerCase();
+        
         const route = Routes.fields(Routes.guilds.resource("status", this.id), key);
         const updatedData = await this.#rest.request("PATCH", route, { status });
 

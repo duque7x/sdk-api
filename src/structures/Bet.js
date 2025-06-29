@@ -103,6 +103,7 @@ class Bet {
 
     async setStatus(status) {
         assert(status && typeof status === "string", "Status must be a string or type STATES");
+        status = status.toLowerCase();
         assert(["off", "on", "created", "shutted", "waiting"].includes(status), "Status not available");
 
         const payload = { set: status };

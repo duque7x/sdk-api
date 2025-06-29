@@ -1,3 +1,4 @@
+const { assert } = require("console");
 const Routes = require("../rest/Routes");
 
 
@@ -73,6 +74,10 @@ class Match {
         return;
     };
     async setStatus(status) {
+        assert(status && typeof status === "string", "Status must be string");
+        status = status.toLowerCase();
+        assert(["off", "on", "created", "shutted"].includes(status), "Status not available");
+
         const route = Routes.guilds.matches.resource(this._id, "status", this.guildId);
         const updatedData = await this.#rest.request("PATCH", route, { status });
 
