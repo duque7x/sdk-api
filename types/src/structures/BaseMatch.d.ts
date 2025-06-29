@@ -1,4 +1,4 @@
-import { BETTYPES, MATCHTYPES, Players, STATES } from "../../..";
+import { BETTYPES, MATCHSTATUS, MATCHTYPES, Players, STATES } from "../../..";
 import { REST } from "../rest/REST";
 import { Bet } from "./Bet";
 import { Match } from "./Match";
@@ -21,10 +21,6 @@ export class BaseMatch {
      */
     type: MATCHTYPES;
 
-    /**
-     * Status of the match
-     */
-    status: STATES;
 
     /**
      * The maximum size of players in a match

@@ -1,5 +1,5 @@
 import { BaseMatch } from "./BaseMatch";
-import { Confirmed, NormalMessage, Player, STATES, BETTYPES, REST, BetData, BasicChannelData } from "../../../index";
+import { Confirmed, NormalMessage, Player, STATES, BETTYPES, REST, BetData, BasicChannelData, BETSTATUS } from "../../../index";
 import { LogsManager } from "../managers/LogsManager";
 import { ChannelManager } from "../managers/ChannelManager";
 
@@ -71,6 +71,11 @@ export declare class Bet extends BaseMatch {
      * The manager of logs in a given bet
      */
     logs: LogsManager;
+
+    /**
+     * This is the status of the bet
+     */
+    status: BETSTATUS;
 
     /**
      * 

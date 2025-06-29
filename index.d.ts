@@ -292,10 +292,18 @@ export interface DailyWins {
  * Represents the possible states of a match.
  */
 export enum MATCHSTATUS {
-  ON = "ON",
-  OFF = "OFF",
-  CREATED = "CREATED",
-  SHUTTED = "SHUTTED",
+  ON = "on",
+  OFF = "off",
+  CREATED = "created",
+  SHUTTED = "shutted",
+}
+
+export enum BETSTATUS {
+  ON = "on",
+  OFF = "off",
+  CREATED = "created",
+  SHUTTED = "shutted",
+  WAITING = "waiting",
 }
 
 /**
@@ -473,27 +481,27 @@ export interface ProductData {
   /**
    * This is the product's emoji
    */
-  emoji: string;
+  emoji?: string;
 
   /**
   * Brief description of the product
   */
-  description: string;
+  description?: string;
 
   /**
   * The product id
   */
-  id: string;
+  id?: string;
 
   /**
    * The price of the product
    */
-  price: number;
+  price?: number;
 
   /**
    * THe buyers of the product
    */
-  buyers: Player[];
+  buyers?: Player[];
 }
 export interface ShopData {
   /**

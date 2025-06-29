@@ -106,8 +106,9 @@ export declare class Product {
 
     /**
      * Deletes this product
+     * @param type The type of the product
      */
-    delete(): Promise<boolean>;
+    delete(type: BuyersType): Promise<boolean>;
 }
 
 type BuyersType = 'bet' | 'match';

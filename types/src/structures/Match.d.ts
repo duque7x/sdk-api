@@ -44,7 +44,11 @@ export declare class Match extends BaseMatch {
      */
     winners: string;
 
-    
+    /**
+ * Status of the match
+ */
+    status: MATCHSTATUS;
+
     /**
      * The winners of the match
      */
