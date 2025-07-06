@@ -56,7 +56,7 @@ export declare class Collection<K, V> extends Map<K, V> {
   get length(): number;
 
   /**
-     * Returns a string representation of this structure
-     */
+   * Returns a string representation of this structure
+   */
   toString(): string;
 }

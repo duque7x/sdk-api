@@ -2,8 +2,6 @@ import { Collection } from "../structures/Collection";
 import { Mediator } from "../structures/Mediator";
 import { REST } from "../rest/REST";
 
-
-
 export declare class MediatorsManager {
   /**
    * The guild's id
@@ -65,4 +63,4 @@ export declare class MediatorsManager {
    */
   update(payload: MediatorData): Promise<void>;
   update(payload: Mediator): Promise<void>;
-};
+}

@@ -27,7 +27,18 @@ module.exports = {
 
             resource: (guildId, userId, ...resources) => `/guilds/${guildId}/mediators/${userId}/${resources.join("/")}`,
         },
+        tickets: {
+            getAll: guildId => `/guilds/${guildId}/tickets`,
+            get: (ticketId, guildId) => `/guilds/${guildId}/tickets/${ticketId}`,
 
+            create: guildId => `/guilds/${guildId}/tickets`,
+            update: (ticketId, guildId) => `/guilds/${guildId}/tickets/${ticketId}`,
+
+            delete: (ticketId, guildId) => `/guilds/${guildId}/tickets/${ticketId}`,
+            deleteAll: guildId => `/guilds/${guildId}/tickets`,
+
+            resource: (guildId, ticketId, ...resources) => `/guilds/${guildId}/tickets/${ticketId}/${resources.join("/")}`,
+        },
         users: {
             getAll: guildId => `/guilds/${guildId}/users`,
             get: (userId, guildId) => `/guilds/${guildId}/users/${userId}`,
@@ -93,6 +104,19 @@ module.exports = {
 
             delete: (guildId) => `/guilds/${guildId}/shop`,
             resource: (guildId, ...args) => `/guilds/${guildId}/shop/${args.join("/")}`,
+        },
+
+
+        channels: {
+            get: (channelType, guildId) => `/guilds/${guildId}/channels/${channelType}`,
+            getAll: (channelType, guildId) => `/guilds/${guildId}/channels`,
+
+            create: guildId => `/guilds/${guildId}/channels`,
+            update: (channelType, guildId) => `/guilds/${guildId}/channels/${channelType}`,
+
+            delete: (channelType, guildId) => `/guilds/${guildId}/channels/${channelType}`,
+            deleteAll: (guildId) => `/guilds/${guildId}/channels`,
+            resource: (guildId, channelType, ...args) => `/guilds/${guildId}/channels/${channelType}/${args.join("/")}`,
         },
     }
 }

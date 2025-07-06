@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const { REST, STATES,  } = require("../index.js");
+const { REST, STATES, BETTYPES, } = require("../index.js");
 const client = new REST().setClientKey("877598927149490186");
 const chalk = require("chalk");
 
@@ -10,8 +10,8 @@ client.init().then(async (_) => {
   console.log(chalk.bgBlue(`Starting to fetch data....`));
 
   // const bet = await guild.bets.fetch("685d42cf3a5244a6cfaa1e5d");
-  const bet = await guild.bets.cache.get("685d9ce8ea270b2de8f6f57c");
-
+  let bet = guild.bets.cache.get("685d9ce8ea270b2de8f6f57c");
+  if (!bet) bet = await guild.bets.create({ creatorId: "877598927149490186", mode: "misto", price: 12, type: BETTYPES.OneVOne })
   // await bet.setStatus(STATES.SHUTTED);
   //await bet.setWinner("412347257233604609");
   // await bet.setLoser("1044050359586394192");
@@ -40,8 +40,11 @@ client.init().then(async (_) => {
 
   //await bet.channels.delete("frw");
 
-  console.log({ channelBefore: bet.channels.cache });
+  //  console.log({ channelBefore: bet?.channels?.cache });
   await bet.channels.setTo([{ id: "save", type: "23444" }, { id: "lol", type: "465675" }]);
+  console.log({ channelAfter: bet.channels.cache });
+
+  await bet.channels.deleteAll();
   console.log({ channelAfter: bet.channels.cache });
 
   const now = Date.now();

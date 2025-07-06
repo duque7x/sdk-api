@@ -3,7 +3,6 @@ import { User } from "../structures/User";
 import { UserCreatePayload } from "../payloads/UserCreatePayload";
 import { Collection } from "../structures/Collection";
 
-
 /**
  * Routes handler for user-related API operations.
  */

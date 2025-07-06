@@ -1,3 +1,4 @@
+import { BETTYPES } from "../../..";
 
 export interface BetPlayer {
     /** The unique Discord user ID of the player */
@@ -7,10 +8,8 @@ export interface BetPlayer {
     name: string;
 }
 export type BetCreatePayload  = {
-    type: BETTYPES | string;
+    type: BETTYPES;
     creatorId: string;
-    adminId: string;
     price: number;
-    embedMessageId?: string;
     mode: string;
 }

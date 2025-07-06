@@ -14,7 +14,7 @@ export class BetUsersManager {
   /**
    * Creates a user in a guild
    * Returns the user if already created
-   * @param payload 
+   * @param payload
    */
   create(payload: Player): Promise<BetUser>;
 

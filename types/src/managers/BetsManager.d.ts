@@ -1,5 +1,6 @@
-import { REST } from "./REST";
-import { Bet, BetData } from "../structures/Bet";
+import { REST } from "../rest/REST";
+import { Bet } from "../structures/Bet";
+import { BetData } from "../../../index";
 import { Collection } from "../structures/Collection";
 import { BetCreatePayload } from "../payloads/BetCreatePayload";
 /**
@@ -22,8 +23,8 @@ export class BetsManager {
    * @param id The bet's ide
    * @param bet The bet data to set
    */
-  set(id: string, bet: BetData): Collection<string, Bet>
-  set(id: string, bet: Bet): Collection<string, Bet>
+  set(id: string, bet: BetData): Collection<string, Bet>;
+  set(id: string, bet: Bet): Collection<string, Bet>;
 
   /**
    * Creates a new bet.
@@ -40,9 +41,9 @@ export class BetsManager {
   fetch(id: string): Promise<Bet>;
 
   /**
-  * Fetches all bets in a guild
-  * @returns Collection of bets
-  */
+   * Fetches all bets in a guild
+   * @returns Collection of bets
+   */
   fetchAll(): Promise<Collection<string, Bet>>;
 
   /**
@@ -53,8 +54,8 @@ export class BetsManager {
   delete(id: string): Promise<void>;
 
   /**
-  * Delets all bets in a guild
-  * @returns Promise void
-  */
+   * Delets all bets in a guild
+   * @returns Promise void
+   */
   deleteAll(): Promise<boolean>;
 }

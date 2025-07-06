@@ -1,8 +1,6 @@
 import { REST } from "../rest/REST";
 import { Collection } from "../structures/Collection";
 
-
-
 export type Messages = Collection<string, LogMessage>;
 
 interface LogData {
@@ -17,10 +15,10 @@ export declare class LogsManager {
     messages: Messages;
 
     /**
-   * Creates a new LogsManager instance.
-   * @param data The logs | message in a given structure
-   * @param rest An instance of the REST client
-   */
+     * Creates a new LogsManager instance.
+     * @param data The logs | message in a given structure
+     * @param rest An instance of the REST client
+     */
     constructor(data: LogData, rest: REST);
 
     /**
@@ -30,5 +28,9 @@ export declare class LogsManager {
      * @param extension If message is an image extension is needed
      * @default extension="txt"
      */
-    addMessage(content: Buffer<any> | string, userId: string, type?: AllowedTypes): Promise<Messages>;
+    addMessage(
+        content: Buffer<any> | string,
+        userId: string,
+        type?: AllowedTypes
+    ): Promise<Messages>;
 }

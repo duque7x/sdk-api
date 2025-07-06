@@ -18,6 +18,8 @@ const { Channel } = require("./src/structures/Channel");
 const { Product } = require("./src/structures/Product");
 const { ProductsManager } = require("./src/managers/products/ProductsManager");
 const { Shop } = require("./src/structures/Shop");
+const { TicketsManager } = require("./src/managers/tickets/TicketsManager");
+const { Ticket } = require("./src/structures/Ticket");
 
 
 const STATES = {
@@ -389,7 +391,7 @@ const LogMessage = {
   updatedAt: Date,
 }
 
-const ProductData  = {
+const ProductData = {
   /**
    * The name of the product
    */
@@ -415,7 +417,7 @@ const ProductData  = {
    */
   buyers: [Player]
 }
-const ShopData  = {
+const ShopData = {
   /**
    * An array of products within a guild
    */
@@ -427,6 +429,17 @@ const ShopData  = {
   boughtCount: 0
 }
 
+const TicketCategory = {
+  type: '',
+  description: '',
+  alias: '',
+  emoji: '',
+}
+
+const TicketsConfiguration = {
+  categories: [TicketCategory],
+}
+
 exports.UsersManager = UsersManager;
 exports.GuildsManager = GuildsManager;
 exports.MatchesManager = MatchesManager;
@@ -434,6 +447,7 @@ exports.LogsManager = LogsManager;
 exports.ChannelManager = ChannelManager;
 exports.BetsManager = BetsManager;
 exports.MediatorsManager = MediatorsManager;
+exports.TicketsManager = TicketsManager;
 
 exports.Collection = Collection;
 exports.Routes = require("./src/rest/Routes");
@@ -447,6 +461,7 @@ exports.BetUser = BetUser;
 exports.Product = Product;
 exports.ProductsManager = ProductsManager;
 exports.Shop = Shop;
+exports.Ticket = Ticket;
 
 exports.UserProtection = UserProtection;
 exports.BaseUserNumericFields = BaseUserNumericFields;
@@ -466,6 +481,8 @@ exports.BetData = BetData;
 exports.LogMessage = LogMessage;
 exports.ProductData = ProductData;
 exports.ShopData = ShopData;
+exports.TicketCategory = TicketCategory;
+exports.TicketsConfiguration = TicketsConfiguration;
 
 exports.STATES = STATES;
 exports.BASESTATUS = BASESTATUS;

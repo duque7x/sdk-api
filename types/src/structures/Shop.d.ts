@@ -20,12 +20,12 @@ export declare class Shop {
     boughtCount: number;
 
     /**
-    * The date of the creation of the match
+    * The date of the creation of the shop
     */
     createdAt: Date;
 
     /**
-     * The last date where the match was updated
+     * The last date where the shop was updated
      */
     updatedAt: Date;
 

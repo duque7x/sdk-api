@@ -4,76 +4,98 @@ import { BetsManager } from "../managers/BetsManager";
 import { BetUsersManager } from "../managers/BetUsersManager";
 import { REST } from "../rest/REST";
 import { MediatorsManager } from "../managers/MediatorsManager";
-import { BlackListed, Emoji, GroupedChannel, GuildData, GUILDSTATUS, NormalGuildKeys, NormalMessage, Role } from "../../..";
+import {
+  BlackListed,
+  Emoji,
+  GroupedChannel,
+  GuildData,
+  GUILDSTATUS,
+  NormalGuildKeys,
+  NormalMessage,
+  Role,
+  TicketsConfiguration,
+} from "../../..";
 import { Shop } from "./Shop";
+import { TicketsManager } from "../managers/TicketsManager";
 
 export class Guild {
-    blacklist: BlackListed[];
+  ticketsConfiguration: TicketsConfiguration;
+  tickets: TicketsManager;
 
-    prefix: string;
-    id: string;
-    seasonId: string;
+  blacklist: BlackListed[];
 
-    channels: GroupedChannel[];
+  prefix: string;
+  id: string;
+  seasonId: string;
 
-    categories: GroupedChannel[];
+  channels: GroupedChannel[];
 
-    roles: Role[];
-    messages: NormalMessage[];
-    emojis: Emoji[];
+  categories: GroupedChannel[];
 
-    name: string;
-    _id: string;
-    pricesOn: number[];
-    pricesAvailable: number[];
-    status: GUILDSTATUS;
+  roles: Role[];
+  messages: NormalMessage[];
+  emojis: Emoji[];
 
-    users: UserManager;
-    betUsers: BetUsersManager;
-    bets: BetsManager;
-    matches: MatchesManager;
-    mediators: MediatorsManager;
-    
-    /**
-     * This the guild shop with products
-     */
-    shop: Shop;
+  name: string;
+  _id: string;
+  pricesOn: number[];
+  pricesAvailable: number[];
+  status: GUILDSTATUS;
 
-    constructor(data: GuildData, rest: REST);
+  users: UserManager;
+  betUsers: BetUsersManager;
+  bets: BetsManager;
+  matches: MatchesManager;
+  mediators: MediatorsManager;
 
-    get data(): GuildData;
+  /**
+   * This the guild shop with products
+   */
+  shop: Shop;
 
-    add<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
-        key: F,
-        value: A
-    ): Promise<A>;
+  constructor(data: GuildData, rest: REST);
 
-    remove<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
-        key: F,
-        value: A
-    ): Promise<A>;
+  get data(): GuildData;
 
-    set<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
-        key: F,
-        value: A
-    ): Promise<A>;
+  add<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
+    key: F,
+    value: A
+  ): Promise<A>;
 
-    setStatus<K extends keyof GUILDSTATUS, V = "on" | "off">(key: K, value: V): Promise<Guild>;
+  remove<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
+    key: F,
+    value: A
+  ): Promise<A>;
 
-    addRole(type: string, id: string): Promise<Guild>;
-    removeRole(type: string, id: string): Promise<Guild>;
+  set<F extends keyof NormalGuildKeys, A = NormalGuildKeys[F]>(
+    key: F,
+    value: A
+  ): Promise<A>;
 
-    addCategory(type: string, id: string): Promise<Guild>;
-    removeCategory(type: string, id: string): Promise<Guild>;
+  setStatus<K extends keyof GUILDSTATUS, V = "on" | "off">(
+    key: K,
+    value: V
+  ): Promise<Guild>;
 
-    addChannel(type: string, id: string): Promise<Guild>;
-    removeChannel(type: string, id: string): Promise<Guild>;
+  addRole(type: string, id: string): Promise<Guild>;
+  removeRole(type: string, id: string): Promise<Guild>;
 
-    setBlacklist(value: boolean, id: string, adminId: string): Promise<Guild>;
+  addCategory(type: string, id: string): Promise<Guild>;
+  removeCategory(type: string, id: string): Promise<Guild>;
 
-    addMessage(type: string, id: string): Promise<Guild>;
-    removeMessage(type: string, id: string): Promise<Guild>;
+  addChannel(type: string, id: string): Promise<Guild>;
+  removeChannel(type: string, id: string): Promise<Guild>;
 
-    addEmoji(type: string, id: string, animated?: boolean): Promise<Guild>;
-    removeEmoji(type: string, id: string): Promise<Guild>;
+  setBlacklist(value: boolean, id: string, adminId: string): Promise<Guild>;
+
+  addMessage(type: string, id: string): Promise<Guild>;
+  removeMessage(type: string, id: string): Promise<Guild>;
+
+  addEmoji(type: string, id: string, animated?: boolean): Promise<Guild>;
+  removeEmoji(type: string, id: string): Promise<Guild>;
+
+  /**
+   * Fetches the guild and returns the most updated data
+   */
+  fetch(): Promise<Guild>;
 }

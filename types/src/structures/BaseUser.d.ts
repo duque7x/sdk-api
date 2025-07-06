@@ -8,19 +8,19 @@ export class BaseUser {
   /**
    * The number of wins the player has.
    * @default 0
-  */
+   */
   wins: number;
 
   /**
-  * The number of MVPs the player has achieved.
-  * D@default 0
-  */
+   * The number of MVPs the player has achieved.
+   * D@default 0
+   */
   mvps: number;
 
   /**
- * The number of losses the player has suffered.
- * @default 0
- */
+   * The number of losses the player has suffered.
+   * @default 0
+   */
   losses: number;
 
   /**
@@ -30,8 +30,8 @@ export class BaseUser {
   blacklist: boolean;
 
   /**
-     * The date of the creation of the user
-     */
+   * The date of the creation of the user
+   */
   createdAt: Date;
 
   /**
@@ -40,8 +40,8 @@ export class BaseUser {
   updatedAt: Date;
 
   /**
-       * Returns a string representation of this structure
-       */
+   * Returns a string representation of this structure
+   */
   toString(): string;
 
   items: Number[];

@@ -8,8 +8,6 @@ const { EventEmitter } = require("node:events");
 const { Collection } = require("../structures/Collection");
 
 exports.REST = class extends EventEmitter {
-  #clientKey;
-
   constructor(clientKey) {
     super({ captureRejections: true });
 
@@ -20,11 +18,11 @@ exports.REST = class extends EventEmitter {
     this.matches = new Collection();
     this.bets = new Collection();
 
-    this.#clientKey = clientKey;
+    this.clientKey = clientKey;
   }
   setClientKey(key) {
     assert(key && typeof key === "string", "Client key must be a string!");
-    this.#clientKey = key;
+    this.clientKey = key;
     return this;
   }
   async init() {
@@ -32,39 +30,34 @@ exports.REST = class extends EventEmitter {
   }
 
   async request(method, path, data) {
-    if (!this.#clientKey) throw new Error("Client Key was not given.")
+    if (!this.clientKey) throw new Error("Client Key was not given.")
     return await this.#requester(method, Routes.base + path, data);
   }
 
-  async #requester(method, url, sendData) {
-    const { data } = await this.doShit(method, url, sendData);
-    return data;
-  };
-  async doShit(method, url, dataToSend) {
-    console.log({ url });
-    method = method.toUpperCase();
+  async #requester(method, url, data) {
+    const makeRequest = async () => {
+      if (process.env.DEV == 'true') console.log({ url });
+      method = method.toUpperCase();
 
-    const makeRequest = async (clientKey) => {
       const headers = new Headers();
       headers.append("duque-auth", process.env.AUTH);
       headers.append("Content-Type", "application/json");
-      headers.append("duque-client-key", clientKey);
+      headers.append("duque-client-key", this.clientKey);
 
       const res = await request(url, {
         method,
         headers,
-        body: dataToSend !== undefined ? JSON.stringify(dataToSend) : undefined,
+        body: data !== undefined ? JSON.stringify(data) : undefined,
       });
 
       const body = await res.body.json();
-      const { data, message } = body;
-
+      const { data: responseData, message } = body;
       if (message) console.log({ message });
-      return { data, message };
-    };
 
+      return responseData;
+    }
     try {
-      return await makeRequest(this.#clientKey);
+      return await makeRequest();
     } catch (error) {
       console.error("Initial request failed:", error.message || error);
 
@@ -73,7 +66,7 @@ exports.REST = class extends EventEmitter {
         tries++;
         await new Promise(resolve => setTimeout(resolve, 1000 * tries));
         try {
-          return await makeRequest(this.#clientKey);
+          return await makeRequest();
         } catch (err) {
           console.error(`Retry #${tries} failed:`, err.message || err);
         }
@@ -81,5 +74,5 @@ exports.REST = class extends EventEmitter {
 
       throw new Error("All retries failed after 5 attempts");
     }
-  }
+  };
 }

@@ -3,21 +3,21 @@ const Routes = require("../../rest/Routes");
 const assert = require("node:assert");
 const { Collection } = require("../../structures/Collection");
 
-exports.LogsManager = class  {
+exports.LogsManager = class {
     #logs;
     #rest;
     #baseUrl;
     constructor(data, rest) {
-        let { guildId, _id } = data;
+        let { guildId, baseUrl } = data;
 
         this.#logs = data;
         this.#rest = rest;
 
         this.guildId = guildId;
-        this.#baseUrl = Routes.guilds.bets.resource(this.guildId, _id, "logs");
+        this.#baseUrl = baseUrl;
 
         this.messages = new Collection();
-        this.#updateMessages(data.messages);
+        this.#updateMessages(data?.messages);
     }
     async addMessage(content, id, type) {
         content = this.resolveContent(content);
@@ -26,12 +26,12 @@ exports.LogsManager = class  {
         assert(content && typeof content === "string", "Content must be a string");
         assert(id && typeof id === "string", "User Id must be present");
 
-        const payload = { type, id, content };
+        const payload = { type, userId: id, content };
         const route = Routes.fields(this.#baseUrl, "messages");
-        const updatedData = await this.#rest.request("POST", route, payload);
+        const response = await this.#rest.request("POST", route, payload);
 
-        this.#updateMessages(updatedData.logs);
-        return updatedData.messages;
+        this.#updateMessages(response);
+        return this.messages;
     }
     resolveContent(content) {
         if (!content) return null;
@@ -46,7 +46,7 @@ exports.LogsManager = class  {
     #updateMessages(messages) {
         if (typeof messages === "object") {
             this.messages.clear();
-            for (let msg of messages) {
+            for (let msg of messages || []) {
                 this.messages.set(`${msg.userId}-${new Date(msg.createdAt).getTime()}`, {
                     content: msg.content ?? "",
                     userId: msg.userId ?? 0,

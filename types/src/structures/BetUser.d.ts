@@ -2,7 +2,6 @@ import { BetUserData, DailyWins } from "../../..";
 import { REST } from "../rest/REST";
 import { BaseUser } from "./BaseUser";
 
-
 export class BetUser extends BaseUser {
   credit: number;
   betsPlayed?: string[];
@@ -14,8 +13,7 @@ export class BetUser extends BaseUser {
       equipped: number;
       allowed: number[];
     };
-  }
-  
+  };
 
   constructor(data: BetUserData, rest: REST, guildId: string);
 
@@ -23,11 +21,20 @@ export class BetUser extends BaseUser {
 
   delete(): Promise<BetUser>;
 
-  add<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUser>;
+  add<F extends keyof BetUserData, A = BetUserData[F]>(
+    field: F,
+    amount: A
+  ): Promise<BetUser>;
 
-  remove<F extends keyof BetUserData, A = BetUserData[F]>(field: F, amount: A): Promise<BetUser>;
+  remove<F extends keyof BetUserData, A = BetUserData[F]>(
+    field: F,
+    amount: A
+  ): Promise<BetUser>;
 
-  set<F extends keyof BetUserData, A = BetUserData[F]>(key: F, value: A): Promise<BetUser>;
+  set<F extends keyof BetUserData, A = BetUserData[F]>(
+    key: F,
+    value: A
+  ): Promise<BetUser>;
 
   setDescription(description: string): Promise<BetUser>;
 
@@ -42,7 +49,7 @@ export class BetUser extends BaseUser {
   setBanner(id: number): Promise<BetUser>;
 
   /**
-     * Returns a string representation of this structure
-     */
+   * Returns a string representation of this structure
+   */
   toString(): string;
 }

@@ -15,7 +15,7 @@ export class ProductsManager {
   /**
    * Creates a product in a guild
    * Returns the product if already created
-   * @param payload 
+   * @param payload
    */
   create(payload: ProductData): Promise<Product>;
 

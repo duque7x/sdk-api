@@ -27,7 +27,7 @@ class Bet {
         this.logs = new LogsManager({
             messages: data?.logs.messages,
             guildId,
-            _id: data?._id
+            baseUrl: Routes.guilds.bets.resource(this.guildId, data?._id, "logs")
         }, rest);
 
         this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
@@ -47,14 +47,13 @@ class Bet {
         this.#rest = rest;
         this.guildId = guildId;
 
-        let channelManagerData = {
+        this.channels = new ChannelManager({
             channels: data.channels,
             baseUrl: Routes.guilds.bets.resource(this.guildId, this._id, "channels"),
             structure: this,
             field: "bets",
             guildId
-        }
-        this.channels = new ChannelManager(channelManagerData, rest);
+        }, rest);
     }
     toString() {
         return `${this._id}`;

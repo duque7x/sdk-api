@@ -24,10 +24,10 @@ export class MatchesManager {
   get cache(): Collection<string, Match>;
 
   /**
-  * Creates a new match.
-  * @param payload - The payload to create the match with.
-  * @returns A promise resolving to the created match data.
-  */
+   * Creates a new match.
+   * @param payload - The payload to create the match with.
+   * @returns A promise resolving to the created match data.
+   */
   create(payload: MatchCreatePayload): Promise<Match>;
 
   /**
@@ -38,14 +38,14 @@ export class MatchesManager {
   fetch(id: string): Promise<Match>;
 
   /**
-  * Fetches all matches in a guild
-  */
+   * Fetches all matches in a guild
+   */
   fetchAll(): Promise<Match>;
 
   /**
-  * Deletes a match by its ID.
-  * @param id - The unique ID of the match.
-  */
+   * Deletes a match by its ID.
+   * @param id - The unique ID of the match.
+   */
   delete(id: string): Promise<Col>;
 
   /**

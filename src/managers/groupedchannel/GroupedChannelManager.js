@@ -1,116 +1,111 @@
-const { Collection } = require("../../structures/Collection");
 const Routes = require("../../rest/Routes");
 const assert = require('node:assert');
-const { Channels } = require("../../structures/Channels");
-const { Channel } = require("../../structures/Channel");
+const { GroupedChannel } = require("../../structures/GroupedChannel");
+const { BaseManager } = require("../BaseManager");
 
-exports.ChannelsManager = class {
+exports.GroupedChannelManager = class GroupedChannelManager extends BaseManager {
   #rest;
-  #channels;
-  /**
-     * 
-     * @param {import("../../../types/src/rest/REST").REST} rest 
-     * @param {string} guildId 
-     */
+
   constructor(data, rest) {
-    this.guildId = data?.guildId;
-    this.field = data?.field;
+    super(data?.channels);
+
+    this.baseUrl = data?.baseUrl;
+    this.guild = data?.guild;
 
     this.#rest = rest;
-    this.#channels = new Collection();
 
-    this.#updateChannels(data.channels);
+    this.#updateChannels(data?.channels);
   }
 
-  get cache() {
-    return this.#channels;
-  }
+  set(type, data) {
+    if (!type || !data) return this.cache;
 
-  set(id, channels) {
-    assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
-    return this.#set(channels);
+    const channelData = {
+      ids: data.ids,
+      type: data.type,
+      guild: this.guild,
+      baseUrl: this.baseUrl,
+      manager: this
+    }
+    const channel = data instanceof GroupedChannel
+      ? data
+      : new GroupedChannel(channelData, this.#rest);
+
+    const existing = this.cache.get(channel.type);
+    if (existing) channel.ids = Array.from(new Set([...existing.ids, ...channel.ids]));
+
+    this.cache.set(channel.type, channel);
+    return channel;
+  }
+  resolveIds(ids) {
+    if (!ids) ids == [];
+    if (!Array.isArray(ids)) ids = [ids];
+    if (Array.isArray(ids)) ids = ids.flat();
+
+    return ids;
+  }
+  async create(type, ids) {
+    assert(type && typeof type === "string", "Type must be a string");
+    ids = this.resolveIds(ids);
+
+    const payload = { type, ids };
+    const route = this.baseUrl;
+    const response = await this.#rest.request("POST", route, payload);
+    const GroupedChannel = this.set(response.type, response);
+
+    this.#rest.emit("groupedChannelCreate", GroupedChannel);
+    return GroupedChannel;
   }
 
   async fetchAll() {
-    const route = Routes.guilds.channels.getAll(this.guildId);
-    const payload = { guildId: this.guildId };
+    const route = this.baseUrl;
+    const payload = { guildId: this.guild.id };
     const response = await this.#rest.request("GET", route, payload);
 
-    this.#channels.clear();
-    for (let channelData of response) {
-      this.#set(channelData);
-    }
-    return this.#channels;
+    this.#updateChannels(response);
+    return this.cache;
   }
 
-  async create(payload) {
+
+  async update(type, payload) {
+    assert(type && typeof type === "string", `${type} must be a string and a Discord Snowflake`);
     assert(payload && typeof payload === "object", "Payload must be an object");
-    assert(payload.id && typeof payload.id === "string", "Payload id must be a string");
-    assert(payload.name && typeof payload.name === "string", "Payload must include name");
 
-    const route = Routes.guilds.channels.create(this.guildId);  // Use correct route
-    const response = await this.#rest.request("POST", route, payload);
-    const channels = new Channel(response, this.#rest, this.guildId, this);
-
-    this.#set(channels);
-    this.#rest.emit("betUserCreate", channels);
-    return channels;
-  }
-
-  async update(payload) {
-    assert(payload && typeof payload === "object", "Payload must be an object");
-    assert(payload.id && typeof payload.id === "string", "Payload id must be a string");
-    assert(payload.name && typeof payload.name === "string", "Payload must include name");
-    payload.guildId = this.guildId;
-
-    const route = Routes.guilds.channels.update(payload.id, this.guildId);  // Use correct route
+    const route = Routes.fields(this.baseUrl, type);
     const response = await this.#rest.request("PATCH", route, payload);
-    const userBefore = this.#channels.get(payload.id);
-    const channels = new Channel(response, this.#rest, this.guildId, this);
+    const channelBefore = this.cache.get(type);
+    const GroupedChannel = this.set(response.type, response);
 
-    this.#rest.emit("betUserUpdate", userBefore, channels);
-    this.#set(channels);
+    this.#rest.emit("groupedChannelUpdate", channelBefore, GroupedChannel);
 
-    return channels;
+    return GroupedChannel;
   }
 
-  async delete(id) {
-    assert(id && typeof id === "string", "Id must be a string");
+  async delete(type) {
+    assert(type && typeof type === "string", "Type must be a string");
 
-    const route = Routes.guilds.channels.delete(id, this.guildId);
-    await this.#rest.request("DELETE", route, { guildId: this.guildId });
+    const route = Routes.fields(this.baseUrl, type);
+    const value = await this.#rest.request("DELETE", route);
 
-    this.#rest.emit("betUserDelete", this.#channels.get(id));
-    this.#removeIdFromCache(id);
-    return this.#channels;
+    this.#rest.emit("groupedChannelDelete", this.cache.get(type));
+    this.#removeIdFromCache(type);
+    return value;
   }
 
   async deleteAll() {
-    const route = Routes.guilds.channels.deleteAll(this.guildId);
-    await this.#rest.request("DELETE", route, { guildId: this.guildId });
-    this.#rest.emit("betUsersDelete", this.#channels);
-    this.#channels.clear();
+    const route = this.baseUrl;
+    const value = await this.#rest.request("DELETE", route, { guildId: this.guild.id });
+    this.#rest.emit("groupedChannelsDelete", this.cache);
+    this.cache.clear();
+
+    return value;
   }
 
   #removeIdFromCache(id) {
-    this.#channels.delete(id);
+    this.cache.delete(id);
   }
 
-  #set(data) {
-    const channels = data instanceof Channels
-      ? data
-      : new Channels(data, this.#rest, this.field, this.guildId, this);
-
-    const existing = this.#channels.get(channels.type);
-    if (existing) {
-      // Merge IDs safely
-      channels.ids = Array.from(new Set([...existing.ids, ...channels.ids]));
-    }
-
-    this.#channels.set(channels.type, channels);
-    return channels;
-  }
   #updateChannels(data) {
-    for (let channel of data || []) this.#set(channel);
+    for (let channel of data || []) this.set(channel.type, channel);
   }
 }

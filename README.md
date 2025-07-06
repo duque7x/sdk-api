@@ -44,6 +44,24 @@ client.init().then(async (_) => {
 
 });
 ```
+
+## Update 2.3.0
+### Tickts is now available. How to use?
+```js
+client.init().then(async (_) => {
+  const guild = client.guilds.cache.get("1336809872884371587");
+
+  const { tickets } = guild;
+  const ticket = await tickets.create("877598927149490186", "support");
+
+  await Promise.all([
+    await ticket.setAdminId("199992755886358528"),
+    await ticket.setClosedById("199992755886358528"),
+    await ticket.setCustomerRating(10),
+    await ticket.setType("support"),
+  ]);
+});
+```
 ## NPM package
 You can find the link [here](https://www.npmjs.com/package/@duque.edits/rest).
 

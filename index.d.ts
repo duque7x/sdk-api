@@ -369,6 +369,17 @@ export interface ChannelInfo {
   name: string;
 }
 
+export interface TicketCategory {
+  type?: string;
+  description?: string;
+  alias?: string;
+  emoji?: string;
+}
+
+export interface TicketsConfiguration {
+  categories: TicketCategory[];
+}
+
 /**
  * Interface representing the data for a single bet.
  */
@@ -389,6 +400,14 @@ export interface BetData {
   creatorId: string;
   adminId: string;
   _id: string;
+}
+export interface TicketData {
+  id: string;
+  creatorId: string;
+  adminId: string;
+  customerRating: number;
+  type: string;
+  status: string;
 }
 
 /**
@@ -437,7 +456,11 @@ export declare const Routes: {
       update: (userId: string, guildId: string) => string;
       delete: (userId: string, guildId: string) => string;
       deleteAll: (guildId: string) => string;
-      resource: (userId: string, resourceName: string, guildId: string) => string;
+      resource: (
+        userId: string,
+        resourceName: string,
+        guildId: string
+      ) => string;
     };
 
     betUsers: {
@@ -447,7 +470,11 @@ export declare const Routes: {
       update: (userId: string, guildId: string) => string;
       delete: (userId: string, guildId: string) => string;
       deleteAll: (guildId: string) => string;
-      resource: (userId: string, resourceName: string, guildId: string) => string;
+      resource: (
+        userId: string,
+        resourceName: string,
+        guildId: string
+      ) => string;
     };
 
     matches: {
@@ -457,7 +484,11 @@ export declare const Routes: {
       update: (matchId: string, guildId: string) => string;
       delete: (matchId: string, guildId: string) => string;
       deleteAll: (guild: string) => string;
-      resource: (matchId: string, resourceName: string, guildId: string) => string;
+      resource: (
+        matchId: string,
+        resourceName: string,
+        guildId: string
+      ) => string;
     };
 
     bets: {
@@ -484,13 +515,13 @@ export interface ProductData {
   emoji?: string;
 
   /**
-  * Brief description of the product
-  */
+   * Brief description of the product
+   */
   description?: string;
 
   /**
-  * The product id
-  */
+   * The product id
+   */
   id?: string;
 
   /**

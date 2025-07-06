@@ -6,6 +6,8 @@ const { MatchesManager } = require("../managers/matches/MatchesManager");
 const { BetUsersManager } = require("../managers/betusers/BetUsersManager");
 const { MediatorsManager } = require("../managers/mediators/MediatorsManager");
 const { Shop } = require("./Shop");
+const { GroupedChannelManager } = require("../managers/groupedchannel/GroupedChannelManager");
+const { TicketsManager } = require("../managers/tickets/TicketsManager");
 
 class Guild {
     #rest;
@@ -27,8 +29,24 @@ class Guild {
         this.messages = data?.messages ?? {};
         this.emojis = data?.emojis ?? {};
 
-        this.channels = data?.channels ?? {};;
-        this.categories = data?.categories ?? {};;
+        this.tickets = new TicketsManager({
+            tickets: data.tickets,
+            guild: this,
+        }, rest);
+
+        this.ticketsConfiguration = data?.ticketsConfiguration;
+
+        this.channels = new GroupedChannelManager({
+            channels: data?.channels,
+            baseUrl: Routes.guilds.resource("channels", data.id),
+            guild: this,
+        }, rest);
+
+        this.categories = new GroupedChannelManager({
+            channels: data?.categories,
+            baseUrl: Routes.guilds.resource("categories", data.id),
+            guild: this,
+        }, rest);
 
         this.users = new UsersManager({ users: data?.users, guildId: this.id }, rest);
         this.betUsers = new BetUsersManager({ betUsers: data?.betUsers, guildId: this.id }, rest);
@@ -46,7 +64,7 @@ class Guild {
             guild: this,
             shop: data.shop,
         }
-        
+
         this.shop = new Shop(shopData, rest);
 
         this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
@@ -57,6 +75,12 @@ class Guild {
     }
     get data() {
         return this.#data;
+    }
+    async fetch() {
+        const route = Routes.guilds.get(this.id);
+        const response = await this.#rest.request("GET", route);
+        this.updateInternals(response);
+        return this;
     }
     async setBlacklist(value, userId, adminId) {
         assert(value !== undefined && typeof value === "boolean", "Value must be a boolean");
@@ -190,7 +214,7 @@ class Guild {
         assert(typeof key == "string", "Key must be a string");
         assert(typeof status == "string", "Status must be a string");
         status = status.toLowerCase();
-        
+
         const route = Routes.fields(Routes.guilds.resource("status", this.id), key);
         const updatedData = await this.#rest.request("PATCH", route, { status });
 
@@ -287,7 +311,7 @@ class Guild {
         setInterval(update, ONE_MINUTE);
     }
 
-    initialize(users, betUsers, bets, matches, mediators) {
+    initialize(users, betUsers, bets, matches, mediators, channels, categories, tickets) {
         for (const user of users ?? []) {
             if (!user?.id) continue;
 
@@ -319,7 +343,18 @@ class Guild {
         for (const mediator of mediators ?? []) {
             if (!mediator?.id) continue;
             this.mediators.set(mediator.id, mediator);
-
+        }
+        for (const channel of channels ?? []) {
+            if (!channel?.type) continue;
+            this.channels.set(channel.type, channel);
+        }
+        for (const category of categories ?? []) {
+            if (!category?.type) continue;
+            this.categories.set(category.type, category);
+        }
+        for (const ticket of tickets ?? []) {
+            if (!ticket?.type) continue;
+            this.tickets.set(ticket.id, ticket);
         }
     }
 
@@ -327,7 +362,7 @@ class Guild {
         for (const key in data) {
             if (["id", "_id", "guildId"].includes(key)) continue;
 
-            const baseKeys = ["prefix", "name", "status", "pricesOn", "pricesAvailable", "updatedAt", "seasonId", "blacklist", "betsChannels", "channels", "roles", "categories"];
+            const baseKeys = ["prefix", "name", "status", "pricesOn", "pricesAvailable", "updatedAt", "seasonId", "blacklist", "betsChannels", "roles", "ticketsConfiguration"];
             if (baseKeys.includes(key)) {
                 this[key] = data[key];
             }
@@ -351,10 +386,21 @@ class Guild {
                 const matches = data.matches;
                 this.initialize([], [], [], matches);
             }
-
             if (key === "mediators") {
                 const mediators = data.mediators;
                 this.initialize([], [], [], [], mediators);
+            }
+            if (key === "channels") {
+                const channels = data.channels;
+                this.initialize([], [], [], [], [], channels);
+            }
+            if (key === "categories") {
+                const categories = data.categories;
+                this.initialize([], [], [], [], [], [], categories);
+            }
+            if (key === "tickets") {
+                const tickets = data.tickets;
+                this.initialize([], [], [], [], [], [], [], tickets);
             }
         }
     }

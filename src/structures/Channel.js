@@ -34,12 +34,12 @@ exports.Channel = class {
     }
     #update(data) {
         if (data.channels) {
-            const ch = data.channels.find(c => c.type == this.#field);
+            const ch = data.channels.find(c => c.type == this.type);
             this.id = ch.id;
-            this.manager.set(ch.id, ch);
+            this.manager.set(ch.type, ch);
         } else {
             this.id = data.id;
-            this.manager.set(data.id, data);
+            this.manager.set(data.type, data);
         }
         return this;
     }
