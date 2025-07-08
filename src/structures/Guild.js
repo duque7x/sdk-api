@@ -328,7 +328,6 @@ class Guild {
 
         for (const bet of bets ?? []) {
             if (!bet?._id) continue;
-
             this.bets.set(bet._id, bet);
             this.#rest.bets.set(bet._id, bet);
         }
@@ -379,7 +378,6 @@ class Guild {
             if (key === "bets") {
                 const bets = data.bets;
                 this.initialize([], [], bets);
-
             }
 
             if (key === "matches") {

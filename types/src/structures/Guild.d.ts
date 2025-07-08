@@ -17,6 +17,7 @@ import {
 } from "../../..";
 import { Shop } from "./Shop";
 import { TicketsManager } from "../managers/TicketsManager";
+import {  GroupedChannelManager } from "../managers/GroupedChannelManager";
 
 export class Guild {
   ticketsConfiguration: TicketsConfiguration;
@@ -28,9 +29,9 @@ export class Guild {
   id: string;
   seasonId: string;
 
-  channels: GroupedChannel[];
+  channels: GroupedChannelManager;
 
-  categories: GroupedChannel[];
+  categories: GroupedChannelManager;
 
   roles: Role[];
   messages: NormalMessage[];
