@@ -15,10 +15,6 @@ export class BaseMatch {
    * The unique id of the match
    */
   _id: string;
-  /**
-   * This is the type of the match
-   */
-  type: MATCHTYPES;
 
   /**
    * The maximum size of players in a match
