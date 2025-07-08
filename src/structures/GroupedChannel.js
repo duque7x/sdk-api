@@ -11,6 +11,8 @@ exports.GroupedChannel = class {
         this.manager = data?.manager;
 
         this.#rest = rest;
+
+        this.ids = this.ids.filter(i => i !== undefined || i !== null);
     }
     toString() {
         return `${this.ids.length}`;
