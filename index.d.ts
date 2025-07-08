@@ -96,9 +96,9 @@ export interface Confirmed {
  * Represents a basic channel structure
  * with ID and type information.
  */
-export interface GroupedChannel {
-  ids: string;
-  type: string;
+export interface GroupedChannelData {
+  ids?: string[];
+  type?: string;
 }
 
 /**
@@ -551,6 +551,8 @@ export * from "./types/src/managers/MatchesManager";
 export * from "./types/src/managers/BetsManager";
 export * from "./types/src/managers/BetUsersManager";
 export * from "./types/src/managers/ProductsManager";
+export * from "./types/src/managers/TicketsManager";
+export * from "./types/src/managers/GroupedChannelManager";
 
 export * from "./types/src/structures/User";
 export * from "./types/src/structures/BetUser";
@@ -561,6 +563,8 @@ export * from "./types/src/structures/Collection";
 export * from "./types/src/structures/Channel";
 export * from "./types/src/structures/Shop";
 export * from "./types/src/structures/Product";
+export * from "./types/src/structures/Ticket";
+export * from "./types/src/structures/GroupedChannel";
 export * from "./types/src/rest/REST";
 export * from "./types/src/rest/REST";
 

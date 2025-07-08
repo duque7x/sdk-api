@@ -160,8 +160,8 @@ const Confirmed = {
  * Represents a basic channel structure
  * with ID and type information.
  */
-const GroupedChannel = {
-  ids: '',
+const GroupedChannelData = {
+  ids: [''],
   type: '',
 };
 
@@ -258,13 +258,13 @@ const NormalGuildKeys = {
   mediators: [Mediator],
 
   channels: {
-    dailyRank: GroupedChannel,
-    blacklist: GroupedChannel,
+    dailyRank: GroupedChannelData,
+    blacklist: GroupedChannelData,
   },
 
   categories: {
-    bets: GroupedChannel,
-    betsChannel: GroupedChannel,
+    bets: GroupedChannelData,
+    betsChannel: GroupedChannelData,
   },
 
   roles: [Role],
