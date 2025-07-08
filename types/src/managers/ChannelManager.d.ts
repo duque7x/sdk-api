@@ -18,6 +18,13 @@ export class ChannelManager {
   create(payload: ChannelData): Promise<Channel>;
 
   /**
+     * Updates a certain channel.
+     * @param type This is the type of the channel
+     * @param payload This is the payload
+     */
+  update(type: string, payload: ChannelData): Promise<Channel>;
+
+  /**
    * Override channels in a given 'structure'
    * @param channels An array of channels to set to
    */

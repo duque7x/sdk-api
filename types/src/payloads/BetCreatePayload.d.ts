@@ -8,7 +8,7 @@ export interface BetPlayer {
     name: string;
 }
 export type BetCreatePayload  = {
-    type: BETTYPES;
+    type: BETTYPES | "1v1" | "2v2" | "3v3" | "4v4";
     creatorId: string;
     price: number;
     mode: string;
