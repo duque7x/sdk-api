@@ -9,6 +9,12 @@ export declare class Collection<K, V> extends Map<K, V> {
   at(index: number): V;
 
   /**
+   * Verifies if given key is in the collection.
+   * @param key Key to verify
+   */
+  has(key: string): boolean;
+
+  /**
    * @returns the user at first
    */
   first(): V;
