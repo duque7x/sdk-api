@@ -17,6 +17,7 @@ import { ChannelManager } from "../managers/ChannelManager";
  * Bet class containing data and methods about the bet in place.
  */
 export declare class Bet extends BaseMatch {
+  type: BETTYPES;
   /**
    * The price of the bet
    */
