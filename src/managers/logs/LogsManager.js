@@ -15,7 +15,7 @@ exports.LogsManager = class {
 
         this.guildId = guildId;
         this.#baseUrl = baseUrl;
-
+        
         this.messages = new Collection();
         this.#updateMessages(data?.messages);
     }

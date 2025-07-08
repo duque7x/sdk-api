@@ -7,7 +7,6 @@ exports.BetsManager = class {
     #bets;
     #rest;
     /**
-     * 
      * @param {import("../../../types/src/rest/REST").REST} rest 
      * @param {string} guildId 
      */

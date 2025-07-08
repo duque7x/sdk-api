@@ -19,7 +19,7 @@ exports.GroupedChannelManager = class GroupedChannelManager extends BaseManager 
 
   set(type, data) {
     if (!type || !data) return this.cache;
-
+    
     const channelData = {
       ids: data.ids,
       type: data.type,
@@ -51,12 +51,25 @@ exports.GroupedChannelManager = class GroupedChannelManager extends BaseManager 
     const payload = { type, ids };
     const route = this.baseUrl;
     const response = await this.#rest.request("POST", route, payload);
+    console.log({ response });
+    
     const GroupedChannel = this.set(response.type, response);
 
     this.#rest.emit("groupedChannelCreate", GroupedChannel);
     return GroupedChannel;
   }
 
+ 
+  async fetch(type) {
+    assert(type && typeof type === "string", `${type} must be a string and a Discord Snowflake`);
+
+    const route = Routes.fields(this.baseUrl, type);
+    const payload = { guildId: this.guild.id };
+    const response = await this.#rest.request("GET", route, payload);
+
+    this.#updateChannels(response);
+    return this.cache;
+  }
   async fetchAll() {
     const route = this.baseUrl;
     const payload = { guildId: this.guild.id };
@@ -65,7 +78,6 @@ exports.GroupedChannelManager = class GroupedChannelManager extends BaseManager 
     this.#updateChannels(response);
     return this.cache;
   }
-
 
   async update(type, payload) {
     assert(type && typeof type === "string", `${type} must be a string and a Discord Snowflake`);
@@ -107,5 +119,6 @@ exports.GroupedChannelManager = class GroupedChannelManager extends BaseManager 
 
   #updateChannels(data) {
     for (let channel of data || []) this.set(channel.type, channel);
+    this.cache = this.cache.filter(c => c !== undefined);
   }
 }

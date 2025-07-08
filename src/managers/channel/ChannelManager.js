@@ -48,6 +48,19 @@ exports.ChannelManager = class {
     assert(id && typeof id === "string", `${id} must be a string and a Discord Snowflake`);
     return this.#set(channel);
   }
+   async update(type, payload) {
+      assert(type && typeof type === "string", `${type} must be a string and a Discord Snowflake`);
+      assert(payload && typeof payload === "object", "Payload must be an object");
+  
+      const route = Routes.fields(this.baseUrl, type);
+      const response = await this.#rest.request("PATCH", route, payload);
+      const channelBefore = this.cache.get(type);
+      const channel = this.set(response.type, response);
+  
+      this.#rest.emit("channelUpdate", channelBefore, channel);
+  
+      return channel;
+    }
   async fetch(type) {
     assert(type && typeof type === "string", `${type} must be a string`);
 
