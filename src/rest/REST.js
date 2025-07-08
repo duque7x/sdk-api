@@ -36,7 +36,7 @@ exports.REST = class extends EventEmitter {
 
   async #requester(method, url, data) {
     const makeRequest = async () => {
-      if (process.env.DEV == 'true') console.log({ url });
+      if (process.env.DEV == 'true') console.log({ request: `${method} ${url}` });
       method = method.toUpperCase();
 
       const headers = new Headers();

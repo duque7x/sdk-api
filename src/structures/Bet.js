@@ -23,6 +23,7 @@ class Bet {
 
         this.type = data?.type || "4v4";
         this.mode = data?.mode || "misto";
+        this.guildId = guildId;
 
         this.logs = new LogsManager({
             messages: data?.logs.messages,
@@ -45,10 +46,9 @@ class Bet {
         this._id = data?._id;
 
         this.#rest = rest;
-        this.guildId = guildId;
 
         this.channels = new ChannelManager({
-            channels: data.channels,
+            channels: data?.channels,
             baseUrl: Routes.guilds.bets.resource(this.guildId, this._id, "channels"),
             structure: this,
             field: "bets",

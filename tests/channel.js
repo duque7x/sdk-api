@@ -10,14 +10,16 @@ client.init().then(async (_) => {
   console.log(chalk.bgBlue(`Starting to fetch data....`));
 
   const categories = guild?.categories;
-  const category = await guild?.categories.cache.get("duq");
+  const category = await guild?.categories.create("duq");
 
-
-  await categories.delete("wwdwd");
   console.log({ category: category.type, chsCahce: categories.cache });
 
-  category.addId("199992755886358528")
+  await category.addId("199992755886358528");
+  await category.addId("877598927149490186");
+  await category.addId("1390818273607684177");
+  await category.addId("199992755886358528");
 
+  console.log({ category });
 
   const now = Date.now();
   console.log(`It took`, chalk.bgRed(`${now - before}ms`), "to fetch all data.");

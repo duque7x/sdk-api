@@ -15,6 +15,10 @@ class Collection extends Map {
             i++;
         }
     }
+    has(key) {
+        return this.get(key) !== undefined ? true : false;
+    }
+
     get first() {
         return this.values().next().value;
     }
@@ -31,6 +35,13 @@ class Collection extends Map {
         return undefined;
     }
     filter(predicate) {
+        const results = new Collection();
+        for (const [key, value] of this) {
+            if (predicate(value, key, this)) results.set(key, value);
+        }
+        return results;
+    }
+    some(predicate) {
         const results = new Collection();
         for (const [key, value] of this) {
             if (predicate(value, key, this)) results.set(key, value);
