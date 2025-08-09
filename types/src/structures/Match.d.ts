@@ -50,6 +50,10 @@ export declare class Match extends BaseMatch {
     status: MATCHSTATUS;
 
     /**
+     * The type of the match
+     */
+    type: MATCHTYPES | "1v1" | "2v2" | "3v3" | "4v4" | "5v5" | "6v6";
+    /**
      * The winners of the match
      */
     losers: string;

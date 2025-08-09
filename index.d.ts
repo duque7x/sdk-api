@@ -1,6 +1,7 @@
 import { MediatorsManager } from "./types/src/managers/MediatorsManager";
 import { Bet } from "./types/src/structures/Bet";
 import { BetUser } from "./types/src/structures/BetUser";
+import { GroupedChannel } from "./types/src/structures/GroupedChannel";
 import { Guild } from "./types/src/structures/Guild";
 import { Match } from "./types/src/structures/Match";
 import { User } from "./types/src/structures/User";
@@ -546,6 +547,14 @@ export interface ShopData {
   boughtCount: number;
 }
 
+export interface Daily {
+  coins?: number;
+  wins?: number;
+  points?: number;
+  losses?: number;
+  credit?: number;
+  mvps?: number;
+}
 export * from "./types/src/managers/UserManager";
 export * from "./types/src/managers/MatchesManager";
 export * from "./types/src/managers/BetsManager";
@@ -565,7 +574,6 @@ export * from "./types/src/structures/Shop";
 export * from "./types/src/structures/Product";
 export * from "./types/src/structures/Ticket";
 export * from "./types/src/structures/GroupedChannel";
-export * from "./types/src/rest/REST";
 export * from "./types/src/rest/REST";
 
 export * from "./types/src/payloads/BetCreatePayload";

@@ -9,6 +9,8 @@ class User {
    * @param {*} data 
    */
   constructor(data, rest, guildId, manager) {
+    this.daily = data?.daily;
+
     this.manager = manager;
 
     this.id = data.id;
@@ -23,7 +25,7 @@ class User {
     this.originalChannels = data.originalChannels;
     this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
     this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
-    this.items = data?.items ?? [];
+    this.items = data?.items || [];
 
     this.#rest = rest;
     this.#data = data;
@@ -93,10 +95,21 @@ class User {
     this.#updateInternals(updatedData);
     return this;
   };
+  async setBlacklist(value) {
+    assert(value !== undefined && typeof value === "boolean", "Value must be a boolean");
 
+    const route = Routes.guilds.users.resource(this.id, "blacklist", this.guildId);
+    const payload = { value, name: this.name };
+    const updatedData = await this.#rest.request("PATCH", route, payload);
+
+    this.#updateInternals(updatedData);
+    return this;
+  }
   #updateInternals(data) {
     for (let key in data) {
       if (key == "id" || key == "_id" || key == "guildId") continue;
+      if (key == "createdAt") this.createdAt = data[key] ? new Date(data[key]) : new Date();
+      if (key == "updatedAt") this.updatedAt = data[key] ? new Date(data[key]) : new Date();
       if (this[key]) this[key] = data[key];
     }
 

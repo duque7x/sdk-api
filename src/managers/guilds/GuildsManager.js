@@ -86,20 +86,14 @@ exports.GuildsManager = class {
     }
 
     async cacheGuilds() {
-        const ONE_MINUTE = 1 * 60 * 1000;
+        const route = Routes.guilds.getAll();
+        const guilds = await this.#rest.request("GET", route);
+        if (!guilds || guilds.error || guilds.message) return new Collection();
 
-        const requestGuilds = async () => {
-            const route = Routes.guilds.getAll();
-            const guilds = await this.#rest.request("GET", route);
-            if (!guilds || guilds.error || guilds.message) return new Collection();
-
-            for (const guildData of guilds) {
-                if (!guildData.id) continue;
-                this.set(guildData.id, guildData);
-            }
-        };
-        await requestGuilds().catch(console.error);
-        setInterval(() => requestGuilds().catch(console.error), ONE_MINUTE);
+        for (const guildData of guilds) {
+            if (!guildData.id) continue;
+            this.set(guildData.id, guildData);
+        }
         return this.#guilds;
     }
 };

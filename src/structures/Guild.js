@@ -8,64 +8,63 @@ const { MediatorsManager } = require("../managers/mediators/MediatorsManager");
 const { Shop } = require("./Shop");
 const { GroupedChannelManager } = require("../managers/groupedchannel/GroupedChannelManager");
 const { TicketsManager } = require("../managers/tickets/TicketsManager");
+const { PermissionsManager } = require("../managers/permissions/PermissionsManager");
 
 class Guild {
     #rest;
     #data;
 
     constructor(data, rest) {
+        this.#rest = rest;
+        this.#data = data;
+
         this.id = data?.id;
+        this.dailyCategories = data?.dailyCategories;
+
         this.name = data?.name;
         this.prefix = data?.prefix;
         this.status = data?.status;
-        this.pricesOn = data?.pricesOn ?? [];
-        this.pricesAvailable = data?.pricesAvailable ?? [];
+        this.pricesOn = data?.pricesOn || [];
+        this.pricesAvailable = data?.pricesAvailable || [];
         this.createdAt = new Date(data.createdAt);
         this.updatedAt = new Date(data.updatedAt);
-        this._id = data?._id;
         this.blacklist = [];
 
-        this.roles = data?.roles ?? {};
-        this.messages = data?.messages ?? {};
-        this.emojis = data?.emojis ?? {};
+        this.roles = data?.roles || {};
+        this.messages = data?.messages || {};
+        this.emojis = data?.emojis || {};
 
-        this.tickets = new TicketsManager({
-            tickets: data.tickets,
-            guild: this,
-        }, rest);
-
+        this.tickets = new TicketsManager({ tickets: data?.tickets, guild: this }, rest);
         this.ticketsConfiguration = data?.ticketsConfiguration;
 
         this.channels = new GroupedChannelManager({
-            channels: data?.channels,
+            data: data?.channels,
             baseUrl: Routes.guilds.resource("channels", data.id),
             guild: this,
         }, rest);
-
         this.categories = new GroupedChannelManager({
-            channels: data?.categories,
+            data: data?.categories,
             baseUrl: Routes.guilds.resource("categories", data.id),
             guild: this,
         }, rest);
+        this.permissions = new PermissionsManager({
+            data: data?.permissions, 
+            baseUrl: Routes.guilds.resource("permissions", data.id),
+            guild: this
+        }, rest);
 
+        
         this.users = new UsersManager({ users: data?.users, guildId: this.id }, rest);
         this.betUsers = new BetUsersManager({ betUsers: data?.betUsers, guildId: this.id }, rest);
         this.bets = new BetsManager({ bets: data?.bets, guildId: this.id }, rest);
         this.matches = new MatchesManager({ matches: data?.matches, guildId: this.id }, rest);
         this.mediators = new MediatorsManager({ mediators: data?.mediators, guildId: this.id }, rest);
 
-        this.#rest = rest;
-        this.#data = data;
-
-        for (let pl of data?.blacklist ?? []) {
-            this.blacklist.push({ id: pl.id, addedBy: pl.addedBy, when: new Date(pl.when) });
-        }
-        let shopData = {
-            guild: this,
-            shop: data.shop,
+        for (let pl of data?.blacklist || []) {
+            this.blacklist.push({ id: pl.id, addedBy: pl.addedBy, when: pl.when ? new Date(pl.when) : new Date() });
         }
 
-        this.shop = new Shop(shopData, rest);
+        this.shop = new Shop({ guild: this, shop: data.shop }, rest);
 
         this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
         this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
@@ -79,23 +78,24 @@ class Guild {
     async fetch() {
         const route = Routes.guilds.get(this.id);
         const response = await this.#rest.request("GET", route);
-        this.updateInternals(response);
+        this.updateData(response);
         return this;
     }
-    async setBlacklist(value, userId, adminId) {
+    async setBlacklist(value, user, adminId) {
         assert(value !== undefined && typeof value === "boolean", "Value must be a boolean");
-
-        const user = this.betUsers.cache.get(userId);
+        const is_in_blacklist = this.blacklist.find(u => u.id == user.id);
+        if (is_in_blacklist && value == true) return this;
 
         const route = Routes.guilds.resource("blacklist", this.id);
-        const payload = {
-            id: userId,
-            name: user.name ?? "dw",
-            adminId,
-            value
-        };
-        const [updatedData] = await Promise.all([this.#rest.request("PATCH", route, payload), user.update({ blacklist: true })]);
-        this.updateInternals(updatedData);
+        const payload = { id: user.id, name: user.name, adminId, value };
+
+        const [updatedData] = await Promise.all([
+            this.#rest.request("PATCH", route, payload),
+            user.setBlacklist(value)
+        ]);
+
+        this.updateData(updatedData);
+        this.#rest.emit("guildUpdate", this);
         return this;
     }
 
@@ -106,7 +106,7 @@ class Guild {
         const route = Routes.guilds.resource("messages", this.id);
         const updatedData = await this.#rest.request("POST", route, { id, type });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -117,7 +117,7 @@ class Guild {
         const route = Routes.fields(Routes.guilds.resource("messages", this.id), type, id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -128,7 +128,7 @@ class Guild {
         const route = Routes.guilds.resource("emojis", this.id);
         const updatedData = await this.#rest.request("POST", route, { id, type, animated });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -139,7 +139,7 @@ class Guild {
         const route = Routes.guilds.resource("emojis", this.id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -150,7 +150,7 @@ class Guild {
         const route = Routes.guilds.resource("roles", this.id);
         const updatedData = await this.#rest.request("POST", route, { id, type });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -161,7 +161,7 @@ class Guild {
         const route = Routes.fields(Routes.guilds.resource("roles", this.id), type, id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -172,7 +172,7 @@ class Guild {
         const route = Routes.guilds.resource("categories", this.id);
         const updatedData = await this.#rest.request("POST", route, { type, id });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -183,7 +183,7 @@ class Guild {
         const route = Routes.fields(Routes.guilds.resource("categories", this.id), type, id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -194,7 +194,7 @@ class Guild {
         const route = Routes.guilds.resource("channels", this.id);
         const updatedData = await this.#rest.request("POST", route, { type, id });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -205,7 +205,7 @@ class Guild {
         const route = Routes.fields(Routes.guilds.resource("channels", this.id), type, id);
         const updatedData = await this.#rest.request("DELETE", route, { id, type });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -218,7 +218,7 @@ class Guild {
         const route = Routes.fields(Routes.guilds.resource("status", this.id), key);
         const updatedData = await this.#rest.request("PATCH", route, { status });
 
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", this);
         return this;
     }
@@ -234,7 +234,7 @@ class Guild {
             assert(value.type && value.id, "Both type and id must be present");
 
             const updatedData = await this.#rest.request("PATCH", route, value);
-            this.updateInternals(updatedData);
+            this.updateData(updatedData);
             this.#rest.emit("guildUpdate", updatedData);
             return updatedData;
         }
@@ -245,13 +245,13 @@ class Guild {
 
             const payload = { status: value.value };
             const updatedData = await this.#rest.request("PATCH", Routes.fields(route, value.type), payload);
-            this.updateInternals(updatedData);
+            this.updateData(updatedData);
             this.#rest.emit("guildUpdate", updatedData);
             return updatedData;
         }
 
         const updatedData = await this.#rest.request("PATCH", route, { [key]: value });
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         this.#rest.emit("guildUpdate", updatedData);
         return updatedData;
     }
@@ -259,7 +259,7 @@ class Guild {
     async remove(key, value) {
         const route = Routes.guilds.resource(key, this.id);
         const updatedData = await this.#rest.request("DELETE", route, { [key]: value });
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         return value;
     }
 
@@ -273,135 +273,90 @@ class Guild {
 
             const route = Routes.fields(Routes.guilds.resource("status", this.id), statusMap[key]);
             const updatedData = await this.#rest.request("PATCH", route, { status: value });
-            this.updateInternals(updatedData);
+            this.updateData(updatedData);
             this.#rest.emit("guildUpdate", this);
             return this.status;
         }
 
         const route = Routes.guilds.resource(key, this.id);
         const updatedData = await this.#rest.request("PATCH", route, { set: value });
-        this.updateInternals(updatedData);
+        this.updateData(updatedData);
         return this.status;
     }
-
-    #autoClean() {
-        this.pricesOn = [...new Set(this.pricesOn)].sort((a, b) => a - b);
-        this.pricesAvailable = [...new Set(this.pricesAvailable)].sort((a, b) => a - b);
-    }
-
-    async updateInternalsFetchly() {
-        const ONE_MINUTE = 1 * 60 * 1000;
-        this.#autoClean();
-        const baseRoute = Routes.guilds.get(this.id);
-
-        const update = async () => {
-            try {
-                const [users, betUsers, bets, matches, mediators] = await Promise.all([
-                    this.#rest.request("GET", Routes.fields(baseRoute, "users")),
-                    this.#rest.request("GET", Routes.fields(baseRoute, "betUsers")),
-                    this.#rest.request("GET", Routes.fields(baseRoute, "bets")),
-                    this.#rest.request("GET", Routes.fields(baseRoute, "matches")),
-                    this.#rest.request("GET", Routes.fields(baseRoute, "mediators")),
-                ]);
-                this.initialize(users, betUsers, bets, matches, mediators);
-            } catch (err) {
-                console.error(`Erro ao atualizar dados da guilda ${this.id}:`, err);
-            }
-        };
-        setInterval(update, ONE_MINUTE);
-    }
-
-    initialize(users, betUsers, bets, matches, mediators, channels, categories, tickets) {
-        for (const user of users ?? []) {
-            if (!user?.id) continue;
-
-            this.users.set(user.id, user);
-            this.#rest.users.set(user.id, user);
-        }
-
-        for (const user of betUsers ?? []) {
-            if (!user?.id) continue;
-
-            this.betUsers.set(user.id, user);
-            this.#rest.betUsers.set(user.id, user);
-        }
-
-        for (const bet of bets ?? []) {
-            if (!bet?._id) continue;
-            this.bets.set(bet._id, bet);
-            this.#rest.bets.set(bet._id, bet);
-        }
-
-        for (const match of matches ?? []) {
-            if (!match?._id) continue;
-
-            this.matches.set(match._id, match);
-            this.#rest.matches.set(match._id, match);
-        }
-
-        for (const mediator of mediators ?? []) {
-            if (!mediator?.id) continue;
-            this.mediators.set(mediator.id, mediator);
-        }
-        for (const channel of channels ?? []) {
-            if (!channel?.type) continue;
-            this.channels.set(channel.type, channel);
-        }
-        for (const category of categories ?? []) {
-            if (!category?.type) continue;
-            this.categories.set(category.type, category);
-        }
-        for (const ticket of tickets ?? []) {
-            if (!ticket?.type) continue;
-            this.tickets.set(ticket.id, ticket);
-        }
-    }
-
-    updateInternals(data) {
+    updateData(data) {
         for (const key in data) {
             if (["id", "_id", "guildId"].includes(key)) continue;
+            if (key == "createdAt") this.createdAt = data[key] ? new Date(data[key]) : new Date();
+            if (key == "updatedAt") this.updatedAt = data[key] ? new Date(data[key]) : new Date();
 
-            const baseKeys = ["prefix", "name", "status", "pricesOn", "pricesAvailable", "updatedAt", "seasonId", "blacklist", "betsChannels", "roles", "ticketsConfiguration"];
-            if (baseKeys.includes(key)) {
-                this[key] = data[key];
-            }
             if (key === "users") {
                 const users = data.users;
-                this.initialize(users);
+                for (const user of users || []) {
+                    if (!user?.id) continue;
+
+                    this.users.set(user.id, user);
+                    this.#rest.users.set(user.id, user);
+                }
             }
 
             if (key === "betUsers") {
                 const betUsers = data.betUsers;
-                this.initialize([], betUsers);
+                for (const user of betUsers || []) {
+                    if (!user?.id) continue;
+
+                    this.betUsers.set(user.id, user);
+                    this.#rest.betUsers.set(user.id, user);
+                }
             }
 
             if (key === "bets") {
                 const bets = data.bets;
-                this.initialize([], [], bets);
+                for (const bet of bets || []) {
+                    if (!bet?._id) continue;
+                    this.bets.set(bet._id, bet);
+                    this.#rest.bets.set(bet._id, bet);
+                }
             }
-
             if (key === "matches") {
                 const matches = data.matches;
-                this.initialize([], [], [], matches);
+                for (const match of matches || []) {
+                    if (!match?._id) continue;
+
+                    this.matches.set(match._id, match);
+                    this.#rest.matches.set(match._id, match);
+                }
             }
             if (key === "mediators") {
                 const mediators = data.mediators;
-                this.initialize([], [], [], [], mediators);
+                for (const mediator of mediators || []) {
+                    if (!mediator?.id) continue;
+                    this.mediators.set(mediator.id, mediator);
+                }
             }
             if (key === "channels") {
                 const channels = data.channels;
-                this.initialize([], [], [], [], [], channels);
+
+                for (const channel of channels || []) {
+                    if (!channel?.type) continue;
+                    this.channels.set(channel.type, channel);
+                }
             }
             if (key === "categories") {
                 const categories = data.categories;
-                this.initialize([], [], [], [], [], [], categories);
+                for (const category of categories || []) {
+                    if (!category?.type) continue;
+                    this.categories.set(category.type, category);
+                }
             }
             if (key === "tickets") {
                 const tickets = data.tickets;
-                this.initialize([], [], [], [], [], [], [], tickets);
+
+                for (const ticket of tickets || []) {
+                    if (!ticket?.type) continue;
+                    this.tickets.set(ticket.id, ticket);
+                }
             }
         }
     }
 }
-
 module.exports = { Guild };

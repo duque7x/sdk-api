@@ -16,9 +16,10 @@ exports.Ticket = class {
         this.type = data?.ticket?.type;
         this.status = data?.ticket?.status;
         this.channelId = data?.ticket?.channelId;
+
         this.createdAt = data?.ticket?.createdAt ? new Date(data?.ticket?.createdAt) : new Date();
         this.updatedAt = data?.ticket?.updatedAt ? new Date(data?.ticket?.updatedAt) : new Date();
-        
+
         this.manager = data?.manager;
 
         this.messages = new LogsManager({
@@ -97,7 +98,16 @@ exports.Ticket = class {
     #update(data) {
         for (let key in data) {
             if (key == "id" || key == "guild") continue;
-
+            if (key === "messages") {
+                this.messages = new LogsManager({
+                    messages: data?.messages,
+                    guildId: this.guild.id,
+                    baseUrl: Routes.guilds.tickets.get(this.id, this.guild.id)
+                }, this.#rest);
+                continue;
+            }
+            if (key == "createdAt") this.createdAt = data[key] ? new Date(data[key]) : new Date();
+            if (key == "updatedAt") this.updatedAt = data[key] ? new Date(data[key]) : new Date();
             if (this[key] !== undefined) this[key] = data[key];
         }
     }

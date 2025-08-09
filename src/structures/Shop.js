@@ -45,6 +45,8 @@ exports.Shop = class {
     #updateInternals(data) {
         for (let key in data) {
             if (key == "id" || key == "_id" || key == "guildId") continue;
+            if (key == "createdAt") this.createdAt = data[key] ? new Date(data[key]) : new Date();
+            if (key == "updatedAt") this.updatedAt = data[key] ? new Date(data[key]) : new Date();
             if (this[key]) this[key] = data[key];
         }
     }

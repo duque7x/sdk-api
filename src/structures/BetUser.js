@@ -9,28 +9,30 @@ exports.BetUser = class {
    * @param {*} data 
    */
   constructor(data, rest, guildId, manager) {
+    this.guildId = guildId || "";
+
+    this.daily = data?.daily;
+
     this.manager = manager;
 
-    this.id = data?.id ?? "";
-    this.name = data?.name ?? "";
+    this.id = data?.id || "";
+    this.name = data?.name || "";
     this.credit = data?.credit ? Number(data?.credit) : 0;
     this.wins = data?.wins ? Number(data?.wins) : 0;
     this.mvps = data?.mvps ? Number(data?.mvps) : 0;
     this.losses = data?.losses ? Number(data?.losses) : 0;
-    this.betsPlayed = data?.betsPlayed ?? [];
-    this.blacklist = data?.blacklist ?? false;
+    this.betsPlayed = data?.betsPlayed || [];
+    this.blacklist = data?.blacklist || false;
     this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
     this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
-    this.items = data?.items ?? [];
+    this.items = data?.items || [];
 
     this.coins = data?.coins ? Number(data?.coins) : 0;
-    this.dailyWins = data?.dailyWins ?? { amount: 0, date: new Date() };
     this.profileCard = data?.profileCard ? data.profileCard : { description: "Use o botão abaixo para alterar a sua bio.", banner: { equipped: 1, allowed: [1] } };
 
     this.#rest = rest;
     this.#data = data;
 
-    this.guildId = guildId ?? "";
   }
   toString() {
     return `<@${this.id}>`;
@@ -169,6 +171,9 @@ exports.BetUser = class {
   #updateInternals(data) {
     for (let key in data) {
       if (key == "id" || key == "_id" || key == "guildId") continue;
+      if (key == "createdAt") this.createdAt = data[key] ? new Date(data[key]) : new Date();
+      if (key == "updatedAt") this.updatedAt = data[key] ? new Date(data[key]) : new Date();
+      
       if (this[key] !== undefined) this[key] = data[key];
     }
     this.manager.set(this.id, this);

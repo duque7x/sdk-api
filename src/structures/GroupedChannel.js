@@ -4,15 +4,15 @@ const Routes = require("../rest/Routes");
 exports.GroupedChannel = class {
     #rest;
     constructor(data, rest) {
-        this.ids = data?.ids || [];
-        this.type = data?.type;
+        this.ids = data?.data?.ids || [];
+        this.type = data?.data?.type;
         this.guild = data?.guild;
-        this.baseUrl = Routes.fields(data?.baseUrl, data?.type);
+        this.ids = this.ids.filter(i => i !== undefined || i !== null);
+
+        this.baseUrl = Routes.fields(data?.baseUrl, data?.data?.type);
         this.manager = data?.manager;
 
         this.#rest = rest;
-
-        this.ids = this.ids.filter(i => i !== undefined || i !== null);
     }
     toString() {
         return `${this.ids.length}`;

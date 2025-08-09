@@ -41,6 +41,7 @@ exports.Channel = class {
             this.id = data.id;
             this.manager.set(data.type, data);
         }
+        
         return this;
     }
 }

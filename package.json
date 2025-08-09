@@ -1,6 +1,6 @@
 {
   "name": "@duque.edits/rest",
-  "version": "2.4.6",
+  "version": "2.5.3",
   "main": "index.js",
   "types": "./index.d.ts",
   "type": "commonjs",

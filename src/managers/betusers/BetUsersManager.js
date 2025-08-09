@@ -124,6 +124,6 @@ exports.BetUsersManager = class {
     return user;
   }
   #updateUsers(data) {
-    for (let user of data ?? []) this.#set(user);
+    for (let user of data || []) this.#set(user);
   }
 }

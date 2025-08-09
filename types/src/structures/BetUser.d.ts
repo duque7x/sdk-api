@@ -1,4 +1,4 @@
-import { BetUserData, DailyWins } from "../../..";
+import { BetUserData, Daily, DailyWins } from "../../..";
 import { REST } from "../rest/REST";
 import { BaseUser } from "./BaseUser";
 
@@ -6,7 +6,7 @@ export class BetUser extends BaseUser {
   credit: number;
   betsPlayed?: string[];
   coins: number;
-  dailyWins: DailyWins;
+  daily: Daily;
   profileCard: {
     description: string;
     banner: {

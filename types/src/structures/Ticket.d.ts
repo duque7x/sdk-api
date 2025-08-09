@@ -4,6 +4,10 @@ import { REST } from "../rest/REST";
 
 export class Ticket {
   /**
+   * The person who closed the ticket
+   */
+  closedById: string;
+  /**
    * The id of the ticket
    */
   id: string;

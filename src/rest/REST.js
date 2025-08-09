@@ -8,7 +8,8 @@ const { EventEmitter } = require("node:events");
 const { Collection } = require("../structures/Collection");
 
 exports.REST = class extends EventEmitter {
-  constructor(clientKey) {
+  #initialized = false;
+  constructor(options) {
     super({ captureRejections: true });
 
     this.guilds = new GuildsManager(this);
@@ -18,14 +19,17 @@ exports.REST = class extends EventEmitter {
     this.matches = new Collection();
     this.bets = new Collection();
 
-    this.clientKey = clientKey;
+    this.clientKey = options?.clientKey;
   }
   setClientKey(key) {
-    assert(key && typeof key === "string", "Client key must be a string!");
+    assert(key && typeof key === "string", "Client key must be a string.");
     this.clientKey = key;
     return this;
   }
   async init() {
+    if (this.#initialized) return;
+
+    this.#initialized = true;
     await this.guilds.cacheGuilds();
   }
 

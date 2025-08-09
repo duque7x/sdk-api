@@ -87,6 +87,6 @@ exports.ProductsManager = class {
         return product;
     }
     #updateProducts(data) {
-        for (let product of data ?? []) this.#set(product);
+        for (let product of data || []) this.#set(product);
     }
 }

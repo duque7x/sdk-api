@@ -1,4 +1,4 @@
-import { BaseUserNumericFields, UserOriginalChannel, UserProtection } from "../../..";
+import { BaseUserNumericFields, Daily, UserOriginalChannel, UserProtection } from "../../..";
 import { BaseUser } from "./BaseUser";
 
 
@@ -6,7 +6,8 @@ import { BaseUser } from "./BaseUser";
  * Interface representing a Player's stats and other information in the database.
  */
 export class User extends BaseUser {
-
+  daily: Daily;
+  
   name: string;
     id: string; 
   /**

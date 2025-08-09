@@ -25,11 +25,6 @@ class Bet {
         this.mode = data?.mode || "misto";
         this.guildId = guildId;
 
-        this.logs = new LogsManager({
-            messages: data?.logs.messages,
-            guildId,
-            baseUrl: Routes.guilds.bets.resource(this.guildId, data?._id, "logs")
-        }, rest);
 
         this.createdAt = data?.createdAt ? new Date(data?.createdAt) : new Date();
         this.updatedAt = data?.updatedAt ? new Date(data?.updatedAt) : new Date();
@@ -54,6 +49,13 @@ class Bet {
             field: "bets",
             guildId
         }, rest);
+
+        this.logs = new LogsManager({
+            messages: data?.logs.messages,
+            guildId,
+            baseUrl: Routes.guilds.bets.resource(this.guildId, data?._id, "logs")
+        }, rest);
+
     }
     toString() {
         return `${this._id}`;
@@ -167,7 +169,6 @@ class Bet {
         this.#updateInternals(updatedData);
         return updatedData["channels"];
     }
-
     async set(key, value) {
         assert(key && typeof key === "string", "Key must be a string");
         assert(value, "Value must be present");
@@ -221,6 +222,14 @@ class Bet {
                 for (let chn of data.channels) {
                     this.channels.set(chn.type, chn);
                 }
+                continue;
+            }
+            if (key == "logs") {
+                this.logs = new LogsManager({
+                    messages: data?.logs.messages,
+                    guildId: this.guildId,
+                    baseUrl: Routes.guilds.bets.resource(this.guildId, data?._id, "logs")
+                }, this.#rest);
                 continue;
             }
             if (this[key]) this[key] = data[key];

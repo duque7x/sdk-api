@@ -15,7 +15,7 @@ exports.LogsManager = class {
 
         this.guildId = guildId;
         this.#baseUrl = baseUrl;
-        
+
         this.messages = new Collection();
         this.#updateMessages(data?.messages);
     }
@@ -48,9 +48,9 @@ exports.LogsManager = class {
             this.messages.clear();
             for (let msg of messages || []) {
                 this.messages.set(`${msg.userId}-${new Date(msg.createdAt).getTime()}`, {
-                    content: msg.content ?? "",
-                    userId: msg.userId ?? 0,
-                    type: msg.type ?? "text",
+                    content: msg.content || "",
+                    userId: msg.userId || 0,
+                    type: msg.type || "text",
                     createdAt: msg.createdAt ? new Date(msg.createdAt) : new Date()
                 });
             }

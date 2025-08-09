@@ -5,6 +5,8 @@ const assert = require('node:assert');
 const { Channel } = require("../../structures/Channel");
 
 exports.ChannelManager = class {
+  static child = Channel;
+
   #rest;
   #channels;
   /**

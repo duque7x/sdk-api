@@ -5,6 +5,7 @@ import { BetUsersManager } from "../managers/BetUsersManager";
 import { REST } from "../rest/REST";
 import { MediatorsManager } from "../managers/MediatorsManager";
 import {
+  BetUser,
   BlackListed,
   Emoji,
   GroupedChannel,
@@ -14,6 +15,7 @@ import {
   NormalMessage,
   Role,
   TicketsConfiguration,
+  User,
 } from "../../..";
 import { Shop } from "./Shop";
 import { TicketsManager } from "../managers/TicketsManager";
@@ -87,7 +89,7 @@ export class Guild {
   addChannel(type: string, id: string): Promise<Guild>;
   removeChannel(type: string, id: string): Promise<Guild>;
 
-  setBlacklist(value: boolean, id: string, adminId: string): Promise<Guild>;
+  setBlacklist(value: boolean, user: User | BetUser, adminId: string): Promise<Guild>;
 
   addMessage(type: string, id: string): Promise<Guild>;
   removeMessage(type: string, id: string): Promise<Guild>;

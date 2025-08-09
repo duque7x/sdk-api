@@ -6,12 +6,14 @@ import { Match } from "../structures/Match";
 import { Guild } from "../structures/Guild";
 import { BetUser } from "../structures/BetUser";
 import { EventEmitter } from "events"; // Import if needed
+import { EventMap } from "../../..";
 export declare class REST extends EventEmitter {
+  clientKey: string;
   /**
    * @param clientKey This is the key that allows customers to have acess to the bots!
    * Can not be bypassed by anyone
    */
-  constructor(clientKey?: string);
+  constructor(options?: { clientKey?: string });
 
   /**
    * Makes a REST request and returns the updated body.
@@ -38,13 +40,11 @@ export declare class REST extends EventEmitter {
     eventName: K,
     listener: (args: EventMap[K]) => void
   ): this;
-  on(eventName: "userCreate", listener: (args: User) => void): this;
-  on(eventName: "guildUpdate", listener: (args: Guild) => void): this;
 
   /**
    *
    * @param key This is the key that allows customers to have acess to the bots!
    * Can not be bypassed by anyone
    */
-  setClientKey(key: string): REST;
+  setClientKey(key?: string): REST;
 }

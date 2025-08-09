@@ -82,6 +82,6 @@ exports.BetsManager = class {
         return bet;
     }
     #updateBets(data) {
-        for (let bet of data ?? []) this.#set(bet);
+        for (let bet of data || []) this.#set(bet);
     }
 }

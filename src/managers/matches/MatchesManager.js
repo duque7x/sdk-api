@@ -77,7 +77,7 @@ exports.MatchesManager = class {
     return match;
   }
   #updateMatches(data) {
-    for (let match of data ?? []) {
+    for (let match of data || []) {
       if (!match && !match._id) continue;
       this.#set(match);
     }
